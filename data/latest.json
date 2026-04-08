@@ -1,0 +1,85 @@
+{
+  "generated_at": "2026-04-07T17:40:00+00:00",
+  "week_label": "Semana 15 · Abril 2026",
+  "current": {
+    "total": 44,
+    "done": 37,
+    "rate": 84,
+    "avg_cycle_time": 9.2,
+    "overdue": 6,
+    "chronic_rollover": 2,
+    "areas": [
+      {"name": "Produto / Programação", "score": "A", "total": 8,  "done": 8,  "rate": 100, "overdue": 0, "cycle_time": null, "backlog": 0},
+      {"name": "Marketing",             "score": "A", "total": 6,  "done": 6,  "rate": 100, "overdue": 0, "cycle_time": null, "backlog": 0},
+      {"name": "Comunicação",           "score": "B", "total": 6,  "done": 5,  "rate": 83,  "overdue": 0, "cycle_time": 2.8,  "backlog": 1},
+      {"name": "Financeiro",            "score": "B", "total": 8,  "done": 7,  "rate": 88,  "overdue": 1, "cycle_time": null, "backlog": 2},
+      {"name": "CS",                    "score": "C", "total": 4,  "done": 3,  "rate": 75,  "overdue": 1, "cycle_time": null, "backlog": 2},
+      {"name": "Comercial",             "score": "C", "total": 11, "done": 9,  "rate": 82,  "overdue": 2, "cycle_time": 7.9,  "backlog": 1},
+      {"name": "Gestão",                "score": "D", "total": 6,  "done": 4,  "rate": 67,  "overdue": 2, "cycle_time": 16.9, "backlog": 0}
+    ],
+    "collaborators": [
+      {"name": "guilhermetcapovilla", "tasks": 8,  "done": 4, "rate": 50, "overloaded": false, "chronic": true,  "severity": "critical", "areas": ["Gestão"],   "overdue": [{"title": "Follow-up leads que receberam proposta", "days": 21, "area": "Gestão"}, {"title": "Verificar processo Meta Partner", "days": 4, "area": "Gestão"}]},
+      {"name": "daniel.violacosta",   "tasks": 6,  "done": 4, "rate": 67, "overloaded": false, "chronic": true,  "severity": "critical", "areas": ["Comercial"], "overdue": [{"title": "Classificar backlog por área e projeto", "days": 21, "area": "Comercial"}]},
+      {"name": "dantasbarretosaulo",  "tasks": 5,  "done": 3, "rate": 60, "overloaded": false, "chronic": false, "severity": "warn",     "areas": ["CS"],       "overdue": [{"title": "Sequência follow-up único para novos clientes", "days": 12, "area": "CS"}]},
+      {"name": "pedro",               "tasks": 7,  "done": 5, "rate": 71, "overloaded": false, "chronic": false, "severity": "warn",     "areas": ["Comercial"], "overdue": [{"title": "Sequência de acompanhamento para leads", "days": 11, "area": "Comercial"}]},
+      {"name": "vini.lovizaro",       "tasks": 9,  "done": 8, "rate": 89, "overloaded": false, "chronic": false, "severity": "warn",     "areas": ["Financeiro"],"overdue": [{"title": "Integrar planilhas locais com a nuvem", "days": 11, "area": "Financeiro"}]},
+      {"name": "mariana.silva",       "tasks": 9,  "done": 9, "rate": 100,"overloaded": false, "chronic": false, "severity": "ok",       "areas": ["Marketing"], "overdue": []},
+      {"name": "carlos.mendes",       "tasks": 12, "done": 11,"rate": 92, "overloaded": true,  "chronic": false, "severity": "warn",     "areas": ["Produto / Programação","CS"], "overdue": []}
+    ],
+    "overdue_tasks": [
+      {"title": "Follow-up leads que receberam proposta",      "area": "Comercial", "days": 21, "assignees": ["daniel.violacosta"],  "due": "17/03"},
+      {"title": "Classificar backlog por área e projeto",      "area": "Gestão",    "days": 21, "assignees": ["guilhermetcapovilla"],"due": "17/03"},
+      {"title": "Sequência follow-up único para novos",        "area": "CS",        "days": 12, "assignees": ["dantasbarretosaulo"], "due": "26/03"},
+      {"title": "Sequência de acompanhamento para leads",      "area": "Comercial", "days": 11, "assignees": ["pedro"],             "due": "27/03"},
+      {"title": "Integrar planilhas locais com a nuvem",       "area": "Financeiro","days": 11, "assignees": ["vini.lovizaro"],     "due": "27/03"},
+      {"title": "Verificar processo para se tornar Meta Partner","area": "Gestão",  "days": 4,  "assignees": ["guilhermetcapovilla"],"due": "03/04"}
+    ]
+  },
+  "previous": {
+    "total": 42,
+    "done": 32,
+    "rate": 76,
+    "avg_cycle_time": 11.4,
+    "overdue": 8,
+    "chronic_rollover": 3,
+    "areas": [
+      {"name": "Produto / Programação", "score": "B", "total": 7,  "done": 6,  "rate": 88,  "overdue": 1, "cycle_time": 4.1,  "backlog": 2},
+      {"name": "Marketing",             "score": "B", "total": 5,  "done": 4,  "rate": 80,  "overdue": 1, "cycle_time": null, "backlog": 1},
+      {"name": "Comunicação",           "score": "B", "total": 5,  "done": 4,  "rate": 80,  "overdue": 1, "cycle_time": 3.5,  "backlog": 2},
+      {"name": "Financeiro",            "score": "C", "total": 7,  "done": 5,  "rate": 71,  "overdue": 2, "cycle_time": null, "backlog": 3},
+      {"name": "CS",                    "score": "C", "total": 4,  "done": 3,  "rate": 75,  "overdue": 2, "cycle_time": null, "backlog": 2},
+      {"name": "Comercial",             "score": "C", "total": 9,  "done": 7,  "rate": 78,  "overdue": 3, "cycle_time": 9.2,  "backlog": 2},
+      {"name": "Gestão",                "score": "D", "total": 5,  "done": 3,  "rate": 60,  "overdue": 3, "cycle_time": 18.2, "backlog": 1}
+    ]
+  },
+  "insights": {
+    "headline": "Semana de recuperação: taxa subiu 8pp, mas crônicos persistem",
+    "status": "neutro",
+    "summary": "O time apresentou melhora expressiva na taxa geral de conclusão (76% → 84%), com Produto e Marketing zerando seus atrasos. O cycle time médio caiu 2.2 dias, indicando ganho real de velocidade. No entanto, os 2 casos de rollover crônico permanecem sem resolução e o aging médio desses itens ainda aumentou.",
+    "highlights": [
+      "Produto e Marketing atingiram 100% de conclusão, eliminando todos os atrasos da semana anterior",
+      "Cycle time médio caiu de 11.4d para 9.2d — melhora de 19% na velocidade de entrega",
+      "Número total de tasks em atraso reduziu de 8 para 6 (-25%)"
+    ],
+    "alerts": [
+      "guilhermetcapovilla acumula 2 tasks com 21+ dias de atraso em Gestão — necessário desbloqueio imediato ou redistribuição das tarefas",
+      "daniel.violacosta mantém a mesma task em atraso pelo terceiro ciclo consecutivo — indicativo de impedimento não reportado",
+      "Área de Gestão com cycle time de 16.9d (quase 2x a média) — revisar se as tarefas estão adequadamente dimensionadas"
+    ],
+    "overload_analysis": "carlos.mendes está com 12 tasks abertas — acima do limiar de sobrecarga da equipe (mediana: 7). Com atuação em 2 áreas simultâneas (Produto e CS), há risco de queda de qualidade e atraso nas próximas semanas. Recomenda-se redistribuir ao menos 3 tasks antes de novas atribuições. As demais distribuições estão coerentes com a capacidade individual observada.",
+    "projections": [
+      "Se os 2 crônicos não forem resolvidos esta semana, entrarão no quarto ciclo de rollover — considere escalar ou cancelar formalmente",
+      "Com a tendência atual de melhora (+8pp/semana), a meta de 90% de taxa é atingível em 2 semanas se os crônicos forem desbloqueados"
+    ],
+    "action_items": [
+      "Conversa individual com guilhermetcapovilla e daniel.violacosta antes da reunião de sexta para mapear o impedimento real nas tasks crônicas",
+      "Redistribuir ao menos 3 tasks de carlos.mendes para equilibrar a carga da equipe"
+    ]
+  },
+  "trend": [
+    {"week": "Sem. 12", "rate": 71, "overdue": 11, "cycle_time": 13.1},
+    {"week": "Sem. 13", "rate": 74, "overdue": 9,  "cycle_time": 12.2},
+    {"week": "Sem. 14", "rate": 76, "overdue": 8,  "cycle_time": 11.4},
+    {"week": "Sem. 15", "rate": 84, "overdue": 6,  "cycle_time": 9.2}
+  ]
+}
