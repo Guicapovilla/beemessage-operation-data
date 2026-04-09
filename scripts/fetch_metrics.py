@@ -359,3 +359,203 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# ── Stripe integration ────────────────────────────────────────────────────────
+def fetch_stripe_okr():
+    """Fetch OKR data from Stripe API."""
+    stripe_key = os.environ.get("STRIPE_SECRET_KEY")
+    if not stripe_key:
+        print("   ⚠️  STRIPE_SECRET_KEY não configurado — OKRs usando dados de exemplo")
+        return None
+
+    headers = {"Authorization": f"Bearer {stripe_key}"}
+
+    try:
+        # Fetch subscriptions to calculate MRR and plan distribution
+        subs_resp = requests.get(
+            "https://api.stripe.com/v1/subscriptions",
+            headers=headers,
+            params={"status": "active", "limit": 100, "expand[]": "data.plan.product"}
+        )
+        subs_resp.raise_for_status()
+        subs = subs_resp.json().get("data", [])
+
+        mrr_total = 0
+        pro_count = 0
+        enterprise_count = 0
+        baseline_mrr = float(os.environ.get("BASELINE_MRR", "0"))  # Set this to your MRR at start of OKR period
+
+        for sub in subs:
+            amount = sub.get("plan", {}).get("amount", 0) / 100  # cents to BRL
+            interval = sub.get("plan", {}).get("interval", "month")
+            monthly = amount if interval == "month" else amount / 12
+            mrr_total += monthly
+
+            product_name = sub.get("plan", {}).get("product", {}).get("name", "").lower()
+            if "enterprise" in product_name:
+                enterprise_count += 1
+            elif "pro" in product_name:
+                pro_count += 1
+
+        total_paid = pro_count + enterprise_count
+        conversion_pct = round((enterprise_count / total_paid * 100) if total_paid > 0 else 0, 1)
+        mrr_growth_pct = round(((mrr_total - baseline_mrr) / baseline_mrr * 100) if baseline_mrr > 0 else 0, 1)
+
+        # Count API implementations from metadata/events (customize per your setup)
+        api_count = int(os.environ.get("API_IMPLEMENTATIONS_COUNT", "6"))  # Manual fallback
+
+        print(f"   Stripe: MRR R${mrr_total:.0f}, Pro→Ent conversão {conversion_pct}%, crescimento {mrr_growth_pct}%")
+
+        return {
+            "mrr_total": round(mrr_total),
+            "mrr_growth_pct": mrr_growth_pct,
+            "pro_count": pro_count,
+            "enterprise_count": enterprise_count,
+            "conversion_pct": conversion_pct,
+            "api_implementations": api_count,
+        }
+
+    except Exception as e:
+        print(f"   ⚠️  Erro ao buscar dados do Stripe: {e}")
+        return None
+
+
+def fetch_plane_okr():
+    """Fetch OKR cycle progress from Plane."""
+    cycle_id = os.environ.get("PLANE_OKR_CYCLE_ID")
+    if not cycle_id:
+        return None
+
+    try:
+        for pid in PROJECT_IDS:
+            try:
+                cycle = plane_get(f"projects/{pid}/cycles/{cycle_id}/")
+                issues = plane_get(f"projects/{pid}/cycles/{cycle_id}/cycle-issues/")
+                total = len(issues)
+                done  = sum(1 for i in issues if i.get("sub_issues_count", 0) == 0)  # adjust per your setup
+                print(f"   Plane OKR: ciclo encontrado, {done}/{total} issues concluídas")
+                return {"total_issues": total, "done_issues": done, "pct": round(done/total*100) if total else 0}
+            except Exception:
+                continue
+    except Exception as e:
+        print(f"   ⚠️  Erro ao buscar OKR do Plane: {e}")
+    return None
+
+
+def build_okr_block(stripe_data, plane_okr):
+    """Build OKR block for latest.json."""
+    s = stripe_data or {}
+    growth = s.get("mrr_growth_pct", 14)
+    conv   = s.get("conversion_pct", 9)
+    api    = s.get("api_implementations", 6)
+
+    insight_parts = []
+    if stripe_data:
+        insight_parts.append(
+            f"Faturamento da base cresceu {growth}% (meta: 30%). "
+            f"Conversão Pro→Enterprise em {conv}% (meta: 24%). "
+            f"Implementações API: {api}/10."
+        )
+        if growth >= 20: insight_parts.append("KR1 em ritmo positivo — acima de 66% da meta.")
+        elif growth < 10: insight_parts.append("KR1 abaixo do ritmo esperado — investigar churn ou falta de upsell.")
+        if conv >= 16: insight_parts.append("KR2 avançando bem. Priorizar clientes Pro com alto uso.")
+        if api >= 7: insight_parts.append("KR3 praticamente atingido — formalizar documentação das implementações.")
+    else:
+        insight_parts.append("Conecte o Stripe (STRIPE_SECRET_KEY) e o Plane OKR (PLANE_OKR_CYCLE_ID) para habilitar análise automática de progresso e projeção de atingimento de metas com dados reais.")
+
+    return {
+        "insight": " ".join(insight_parts),
+        "key_results": [
+            {
+                "label": "KR1 · Aumentar faturamento da base +30%",
+                "icon": "📈", "unit": "%",
+                "current": growth, "target": 30,
+                "delta": None,
+                "details": [
+                    {"label": "MRR atual",           "value": f"R${s.get('mrr_total','—')}" if stripe_data else "— (aguardando Stripe)", "color": "#4a4f6a" if not stripe_data else "#60a5fa"},
+                    {"label": "Crescimento acumulado","value": f"{growth}%",                  "color": "#f5a623" if growth < 20 else "#3ecf8e"},
+                    {"label": "Meta trimestral",      "value": "+30%",                          "color": "#7b8099"},
+                    {"label": "Ritmo necessário",     "value": "~5.3pp / semana",               "color": "#7b8099"},
+                ]
+            },
+            {
+                "label": "KR2 · Converter 24% dos clientes Pro → Enterprise",
+                "icon": "🚀", "unit": "%",
+                "current": conv, "target": 24,
+                "delta": None,
+                "details": [
+                    {"label": "Clientes Pro ativos",          "value": str(s.get("pro_count", "—")) if stripe_data else "— (aguardando Stripe)", "color": "#4a4f6a" if not stripe_data else "#60a5fa"},
+                    {"label": "Convertidos para Enterprise",  "value": f"{conv}%",               "color": "#f5a623" if conv < 16 else "#3ecf8e"},
+                    {"label": "Meta trimestral",              "value": "24%",                    "color": "#7b8099"},
+                    {"label": "Ritmo necessário",             "value": "~3.75pp / semana",       "color": "#7b8099"},
+                ]
+            },
+            {
+                "label": "KR3 · 10 implementações API realizadas",
+                "icon": "⚙️", "unit": "",
+                "current": api, "target": 10,
+                "delta": None,
+                "details": [
+                    {"label": "Implementações concluídas", "value": str(api),        "color": "#60a5fa"},
+                    {"label": "Em andamento",              "value": str(plane_okr.get("done_issues", "—") if plane_okr else "—"), "color": "#f5a623"},
+                    {"label": "Meta trimestral",           "value": "10",             "color": "#7b8099"},
+                    {"label": "Ritmo necessário",          "value": "~0.6 / semana", "color": "#7b8099"},
+                ]
+            },
+        ]
+    }
+
+
+# Patch main() to include OKR data
+_original_main = main
+
+def main():
+    print("🔄 Buscando issues do Plane...")
+    issues = fetch_all_issues()
+    states = fetch_states()
+    print(f"   {len(issues)} issues carregadas")
+
+    this_week, prev_week_issues, all_issues = classify(issues, states)
+
+    print("📊 Calculando métricas...")
+    current  = compute_metrics(this_week, all_issues)
+    previous = compute_metrics(prev_week_issues, all_issues)
+
+    print("📦 Buscando dados do Stripe e OKR do Plane...")
+    stripe_data = fetch_stripe_okr()
+    plane_okr   = fetch_plane_okr()
+    okr_block   = build_okr_block(stripe_data, plane_okr)
+
+    print("🤖 Gerando insights com Claude...")
+    insights = generate_insights(current, previous)
+
+    snapshots = load_snapshots()
+    prev_snapshot = snapshots[-1] if snapshots else previous
+    week_label = f"Semana {NOW.isocalendar()[1]} · {NOW.strftime('%B %Y').capitalize()}"
+
+    output = {
+        "generated_at": NOW.isoformat(),
+        "week_label": week_label,
+        "current": current,
+        "previous": prev_snapshot.get("current", previous) if isinstance(prev_snapshot, dict) else previous,
+        "insights": insights,
+        "okr": okr_block,
+        "trend": [
+            {"week": s.get("week_label",""), "rate": s.get("current",{}).get("rate",0),
+             "overdue": s.get("current",{}).get("overdue",0),
+             "cycle_time": s.get("current",{}).get("avg_cycle_time",0)}
+            for s in snapshots[-5:]
+        ] + [{"week": week_label, "rate": current["rate"],
+              "overdue": current["overdue"], "cycle_time": current["avg_cycle_time"] or 0}]
+    }
+
+    snapshots.append({"week_label": week_label, "current": current})
+    save_snapshots(snapshots)
+
+    os.makedirs("data", exist_ok=True)
+    with open("data/latest.json", "w") as f:
+        json.dump(output, f, indent=2, default=str, ensure_ascii=False)
+
+    print(f"✅ data/latest.json salvo — semana {week_label}")
+    print(f"   Taxa: {current['rate']}% | C.Time: {current['avg_cycle_time']}d | Atrasos: {current['overdue']}")
