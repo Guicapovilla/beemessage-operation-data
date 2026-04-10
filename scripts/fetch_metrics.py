@@ -8,6 +8,7 @@ Salva o resultado em data/latest.json para o dashboard consumir.
 import os
 import json
 import math
+import time
 import requests
 from datetime import datetime, timedelta, timezone
 from collections import defaultdict
@@ -30,8 +31,18 @@ PREV_WEEK_START= WEEK_START - timedelta(days=7)
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def plane_get(path, params=None):
     url = f"{PLANE_BASE}/workspaces/{PLANE_SLUG}/{path}"
-    r = requests.get(url, headers=HEADERS_PLANE, params=params or {})
-    r.raise_for_status()
+    for attempt in range(5):
+        r = requests.get(url, headers=HEADERS_PLANE, params=params or {})
+        if r.status_code == 429 and attempt < 4:
+            raw = r.headers.get("Retry-After", "45")
+            try:
+                wait = int(raw)
+            except ValueError:
+                wait = 45
+            time.sleep(min(max(wait, 5), 120))
+            continue
+        r.raise_for_status()
+        break
     data = r.json()
     if isinstance(data, dict) and "results" in data:
         return data["results"]
@@ -308,6 +319,64 @@ def save_snapshots(snaps):
         json.dump(snaps[-12:], f, indent=2, default=str)  # keep last 12 weeks
 
 
+def apply_week_flow_metrics(current, this_week, all_issues):
+    """Criadas na semana (coorte) vs concluídas com completed_at na semana (qualquer idade)."""
+    created_week = len(this_week)
+    completed_week = sum(
+        1
+        for i in all_issues
+        if i.get("_completed") and WEEK_START <= i["_completed"] <= NOW
+    )
+    current["created_week"] = created_week
+    current["completed_week"] = completed_week
+    current["balance_week"] = created_week - completed_week
+
+
+def trend_row_from_snapshot(snap):
+    cur = (snap or {}).get("current") or {}
+    if not isinstance(cur, dict):
+        cur = {}
+    total = int(cur.get("total") or 0)
+    done = int(cur.get("done") or 0)
+    row = {
+        "week": (snap or {}).get("week_label", "") or "",
+        "rate": cur.get("rate", 0) or 0,
+        "overdue": cur.get("overdue", 0) or 0,
+        "cycle_time": cur.get("avg_cycle_time") or 0,
+        "total": total,
+        "done": done,
+        "remaining": max(0, total - done),
+    }
+    if "created_week" in cur:
+        row["created_week"] = cur.get("created_week")
+    if "completed_week" in cur:
+        row["completed_week"] = cur.get("completed_week")
+    if "balance_week" in cur:
+        row["balance_week"] = cur.get("balance_week")
+    return row
+
+
+def trend_row_current(week_label, current):
+    total = int(current.get("total") or 0)
+    done = int(current.get("done") or 0)
+    row = {
+        "week": week_label,
+        "rate": current.get("rate", 0),
+        "overdue": current.get("overdue", 0),
+        "cycle_time": current.get("avg_cycle_time") or 0,
+        "total": total,
+        "done": done,
+        "remaining": max(0, total - done),
+    }
+    if "created_week" in current:
+        row["created_week"] = current.get("created_week")
+    if "completed_week" in current:
+        row["completed_week"] = current.get("completed_week")
+    if "balance_week" in current:
+        row["balance_week"] = current.get("balance_week")
+    return row
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
     print("🔄 Buscando issues do Plane...")
@@ -320,6 +389,7 @@ def main():
     print("📊 Calculando métricas...")
     current  = compute_metrics(this_week, all_issues)
     previous = compute_metrics(prev_week_issues, all_issues)
+    apply_week_flow_metrics(current, this_week, all_issues)
 
     print("🤖 Gerando insights com Claude...")
     insights = generate_insights(current, previous)
@@ -336,13 +406,8 @@ def main():
         "current": current,
         "previous": prev_snapshot.get("current", previous) if isinstance(prev_snapshot, dict) else previous,
         "insights": insights,
-        "trend": [
-            {"week": s.get("week_label",""), "rate": s.get("current",{}).get("rate",0),
-             "overdue": s.get("current",{}).get("overdue",0),
-             "cycle_time": s.get("current",{}).get("avg_cycle_time",0)}
-            for s in snapshots[-5:]
-        ] + [{"week": week_label, "rate": current["rate"],
-              "overdue": current["overdue"], "cycle_time": current["avg_cycle_time"] or 0}]
+        "trend": [trend_row_from_snapshot(s) for s in snapshots[-5:]]
+        + [trend_row_current(week_label, current)],
     }
 
     # Save snapshot
@@ -355,10 +420,7 @@ def main():
 
     print(f"✅ data/latest.json salvo — semana {week_label}")
     print(f"   Taxa: {current['rate']}% | C.Time: {current['avg_cycle_time']}d | Atrasos: {current['overdue']}")
-
-
-if __name__ == "__main__":
-    main()
+    print(f"   Fluxo semana: {current.get('created_week', '?')} criadas, {current.get('completed_week', '?')} concluídas, saldo {current.get('balance_week', '?')}")
 
 
 # ── Stripe integration ────────────────────────────────────────────────────────
@@ -521,6 +583,7 @@ def main():
     print("📊 Calculando métricas...")
     current  = compute_metrics(this_week, all_issues)
     previous = compute_metrics(prev_week_issues, all_issues)
+    apply_week_flow_metrics(current, this_week, all_issues)
 
     print("📦 Buscando dados do Stripe e OKR do Plane...")
     stripe_data = fetch_stripe_okr()
@@ -541,13 +604,8 @@ def main():
         "previous": prev_snapshot.get("current", previous) if isinstance(prev_snapshot, dict) else previous,
         "insights": insights,
         "okr": okr_block,
-        "trend": [
-            {"week": s.get("week_label",""), "rate": s.get("current",{}).get("rate",0),
-             "overdue": s.get("current",{}).get("overdue",0),
-             "cycle_time": s.get("current",{}).get("avg_cycle_time",0)}
-            for s in snapshots[-5:]
-        ] + [{"week": week_label, "rate": current["rate"],
-              "overdue": current["overdue"], "cycle_time": current["avg_cycle_time"] or 0}]
+        "trend": [trend_row_from_snapshot(s) for s in snapshots[-5:]]
+        + [trend_row_current(week_label, current)],
     }
 
     snapshots.append({"week_label": week_label, "current": current})
@@ -559,3 +617,8 @@ def main():
 
     print(f"✅ data/latest.json salvo — semana {week_label}")
     print(f"   Taxa: {current['rate']}% | C.Time: {current['avg_cycle_time']}d | Atrasos: {current['overdue']}")
+    print(f"   Fluxo semana: {current.get('created_week', '?')} criadas, {current.get('completed_week', '?')} concluídas, saldo {current.get('balance_week', '?')}")
+
+
+if __name__ == "__main__":
+    main()

@@ -8,6 +8,26 @@ Dashboard semanal de operações com dados automáticos do Plane e insights gera
 - Token da API do Plane
 - API Key da Anthropic (Claude)
 
+## Ambiente local de teste
+
+Para validar tudo localmente antes de subir para o GitHub Actions:
+
+1. Criar ambiente virtual Python:
+   - `python -m venv .venv`
+   - `source .venv/bin/activate`
+2. Instalar dependências:
+   - `pip install -r requirements.txt`
+3. Configurar variáveis locais:
+   - `cp .env.example .env`
+   - preencha os campos no arquivo `.env`
+4. Gerar dados:
+   - `python scripts/fetch_metrics.py`
+5. Visualizar dashboard local:
+   - `python -m http.server 8000`
+   - abra `http://localhost:8000`
+
+Se faltar alguma env obrigatória, o script agora mostra claramente qual variável precisa ser configurada.
+
 ---
 
 ## Passo a passo — 15 minutos
@@ -43,14 +63,24 @@ Aguarde 1-2 minutos. Seu dashboard estará disponível em:
 
 Vá em **Settings → Secrets and variables → Actions → New repository secret**
 
-Adicione os seguintes secrets:
+**Obrigatórios** (sem eles o workflow falha ao rodar o script):
 
 | Nome | Valor |
 |------|-------|
-| `PLANE_API_TOKEN` | Seu token do Plane (Settings → API Tokens) |
-| `PLANE_WORKSPACE_SLUG` | O slug do seu workspace (ex: `beemessage`) |
-| `PLANE_PROJECT_IDS` | IDs dos projetos separados por vírgula (ex: `uuid1,uuid2`) |
-| `ANTHROPIC_API_KEY` | Sua API key da Anthropic |
+| `PLANE_API_TOKEN` | Token do Plane (Settings → API Tokens) |
+| `PLANE_WORKSPACE_SLUG` | Slug do workspace (ex: `beemessage`) |
+| `PLANE_PROJECT_IDS` | UUIDs dos projetos, separados por vírgula |
+| `ANTHROPIC_API_KEY` | API key da Anthropic (Claude) |
+
+**Opcionais** (só crie se quiser OKR/Stripe reais no JSON; se omitir, o script usa fallbacks ou ignora):
+
+| Nome | Valor |
+|------|-------|
+| `STRIPE_SECRET_KEY` | Secret key do Stripe (MRR, conversão Pro→Enterprise) |
+| `BASELINE_MRR` | MRR base numérico para cálculo de crescimento (ex: `10000`) |
+| `API_IMPLEMENTATIONS_COUNT` | Número manual de implementações API (padrão no código: 6) |
+| `PLANE_OKR_CYCLE_ID` | UUID do ciclo de OKR no Plane |
+| `PLANE_OKR_MODULE_IDS` | Reservado para evolução do script; pode ficar vazio |
 
 #### Como encontrar o PLANE_WORKSPACE_SLUG
 Na URL do Plane: `app.plane.so/SEU-SLUG/projects/...` — o slug é a parte após `app.plane.so/`.
@@ -61,20 +91,16 @@ Na URL de cada projeto: `app.plane.so/workspace/projects/ESTE-UUID-AQUI/issues/`
 ### 5. Testar manualmente
 
 1. Vá em **Actions** no repositório
-2. Clique em **Atualizar Dashboard Semanal**
-3. Clique em **Run workflow → Run workflow**
-4. Aguarde ~2 minutos
-5. Acesse sua URL do GitHub Pages — o dashboard estará atualizado
+2. Abra o workflow **Atualizar dashboard**
+3. **Run workflow → Run workflow**
+4. Aguarde ~1–3 minutos
+5. Confira o commit em `main` em `data/latest.json` e a URL do GitHub Pages (o `index.html` já evita cache com `?v=timestamp` no fetch)
 
 ### 6. Agendamento automático
 
-O script já está configurado para rodar toda **sexta-feira às 13h00 (horário de Brasília)**, antes da sua reunião das 14h.
+O workflow roda **todo dia às 07:00 (horário de Brasília, `America/Sao_Paulo`)**. O agendamento do GitHub Actions é em **UTC**, por isso o cron é `0 10 * * *` (10:00 UTC ≈ 07:00 BRT).
 
-Para alterar o horário, edite a linha `cron` em `.github/workflows/update.yml`:
-```
-# Formato: minuto hora dia mês dia-da-semana (UTC, BRT = UTC-3)
-- cron: "0 16 * * 5"   # sexta 13h BRT
-```
+Para mudar o horário, edite a linha `cron` em [`.github/workflows/update.yml`](.github/workflows/update.yml) convertendo o horário desejado em Brasília para UTC (BRT = UTC−3).
 
 ---
 

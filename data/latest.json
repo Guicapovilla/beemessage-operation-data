@@ -8,6 +8,9 @@
     "avg_cycle_time": 9.2,
     "overdue": 6,
     "chronic_rollover": 2,
+    "created_week": 14,
+    "completed_week": 31,
+    "balance_week": -17,
     "areas": [
       {"name": "Produto / Programação", "score": "A", "total": 8,  "done": 8,  "rate": 100, "overdue": 0, "cycle_time": null, "backlog": 0},
       {"name": "Marketing",             "score": "A", "total": 6,  "done": 6,  "rate": 100, "overdue": 0, "cycle_time": null, "backlog": 0},
@@ -77,9 +80,9 @@
     ]
   },
   "trend": [
-    {"week": "Sem. 12", "rate": 71, "overdue": 11, "cycle_time": 13.1},
-    {"week": "Sem. 13", "rate": 74, "overdue": 9,  "cycle_time": 12.2},
-    {"week": "Sem. 14", "rate": 76, "overdue": 8,  "cycle_time": 11.4},
-    {"week": "Sem. 15", "rate": 84, "overdue": 6,  "cycle_time": 9.2}
+    {"week": "Sem. 12", "rate": 71, "overdue": 11, "cycle_time": 13.1, "total": 45, "done": 32, "remaining": 13, "created_week": 52, "completed_week": 28, "balance_week": 24},
+    {"week": "Sem. 13", "rate": 74, "overdue": 9,  "cycle_time": 12.2, "total": 43, "done": 32, "remaining": 11, "created_week": 41, "completed_week": 36, "balance_week": 5},
+    {"week": "Sem. 14", "rate": 76, "overdue": 8,  "cycle_time": 11.4, "total": 42, "done": 32, "remaining": 10, "created_week": 38, "completed_week": 33, "balance_week": 5},
+    {"week": "Sem. 15", "rate": 84, "overdue": 6,  "cycle_time": 9.2,  "total": 44, "done": 37, "remaining": 7, "created_week": 14, "completed_week": 31, "balance_week": -17}
   ]
 }

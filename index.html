@@ -40,6 +40,21 @@
   .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:28px}
   .kpi{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:16px 18px}
   .kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+  .kpi-label-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+  .kpi-label-row .kpi-label{margin-bottom:0;flex:1;min-width:0}
+  .help-q{flex-shrink:0;width:18px;height:18px;padding:0;border:.5px solid var(--border2);border-radius:50%;background:var(--surface2);color:var(--muted);font-size:11px;font-weight:700;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:color .15s,background .15s,border-color .15s}
+  .help-q:hover{color:var(--blue);border-color:rgba(96,165,250,.45);background:rgba(96,165,250,.12)}
+  .help-q:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .help-q-sm{width:16px;height:16px;font-size:10px}
+  .th-help{display:inline-flex;align-items:center;gap:6px;vertical-align:middle}
+  dialog.metric-help-dlg{border:none;border-radius:var(--radius-lg);padding:0;max-width:min(420px,calc(100vw - 32px));background:var(--surface);color:var(--text);box-shadow:0 16px 48px rgba(0,0,0,.45);border:.5px solid var(--border2)}
+  dialog.metric-help-dlg::backdrop{background:rgba(0,0,0,.55)}
+  .mhd-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 12px;border-bottom:.5px solid var(--border)}
+  .mhd-title{font-size:15px;font-weight:600;line-height:1.35;letter-spacing:-.2px}
+  .mhd-close{width:32px;height:32px;border:none;border-radius:8px;background:var(--surface2);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;flex-shrink:0}
+  .mhd-close:hover{color:var(--text);background:var(--border)}
+  .mhd-body{padding:16px 18px 20px;font-size:13px;color:#bbc0d0;line-height:1.65}
+  .mhd-body p+p{margin-top:12px}
   .kpi-value{font-size:26px;font-weight:700;letter-spacing:-.5px}
   .kpi-delta{font-size:11px;margin-top:5px;display:flex;align-items:center;gap:5px}
   .up{color:var(--green)}.down{color:var(--red)}.flat{color:var(--muted)}
@@ -82,15 +97,43 @@
   .od-item{display:flex;justify-content:space-between;gap:8px;margin-top:4px}
   .od-title{color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .od-days{font-weight:600;flex-shrink:0}
+  details.cc-expand{display:block;background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:0;overflow:hidden}
+  details.cc-expand.critical{border-color:rgba(245,101,101,.4);background:rgba(245,101,101,.05)}
+  details.cc-expand.warn{border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.04)}
+  details.cc-expand summary{list-style:none;cursor:pointer;padding:16px}
+  details.cc-expand summary::-webkit-details-marker{display:none}
+  .cc-expand-hint{font-size:11px;color:var(--blue);margin-top:10px;display:flex;align-items:center;gap:6px;font-weight:500}
+  details.cc-expand[open] .cc-expand-hint{color:var(--muted)}
+  .cc-chev{display:inline-block;transition:transform .15s;font-size:10px;opacity:.85}
+  details.cc-expand[open] .cc-chev{transform:rotate(90deg)}
+  .cc-od-panel{padding:0 16px 16px;border-top:.5px solid var(--border);background:rgba(0,0,0,.12)}
+  .cc-od-panel-hdr{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);font-weight:600;padding:12px 0 8px}
+  .od-item-full{align-items:flex-start;margin-top:8px;padding:10px 12px;background:var(--surface2);border-radius:8px;border:.5px solid var(--border)}
+  .od-item-full:first-of-type{margin-top:0}
+  .od-title-full{font-size:12px;color:var(--text);line-height:1.45;word-break:break-word}
+  .od-area{font-size:11px;color:var(--muted);margin-top:4px}
+  .od-item-text{flex:1;min-width:0}
   .tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
   .tag-c{background:var(--red-bg);color:var(--red)}
   .tag-w{background:var(--amber-bg);color:var(--amber)}
   .chart-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:12px}
-  .ch-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .ch-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .ch-title-stack{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
   .ch-title{font-size:12px;font-weight:500;color:var(--muted)}
+  .ch-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .ch-sub{font-size:11px;color:var(--hint);line-height:1.45;max-width:520px}
   .ch-leg{display:flex;gap:14px;flex-wrap:wrap}
   .cl-i{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
   .cl-d{width:8px;height:8px;border-radius:2px}
+  .flow-week{margin-top:14px;padding:12px 14px;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px}
+  .flow-week-hdr{display:flex;align-items:center;gap:8px;margin-right:8px}
+  .flow-week-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .flow-week-item{display:flex;flex-direction:column;gap:3px;min-width:72px}
+  .flow-week-lbl{font-size:10px;color:var(--hint);text-transform:uppercase;letter-spacing:.05em}
+  .flow-week-val{font-weight:700;font-size:16px;letter-spacing:-.3px;color:var(--text)}
+  .flow-week-val-bal-pos{color:var(--amber)}
+  .flow-week-val-bal-neg{color:var(--green)}
+  .flow-week-sub{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4;max-width:520px}
   .iw{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:22px 24px;margin-bottom:12px}
   .i-hl{font-size:16px;font-weight:600;margin-bottom:12px;line-height:1.4}
   .i-sm{font-size:13px;color:#bbc0d0;line-height:1.7;margin-bottom:18px}
@@ -106,6 +149,34 @@
   .i-ov{background:rgba(96,165,250,.07);border:.5px solid rgba(96,165,250,.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:18px}
   .i-ov h3{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);font-weight:600;margin-bottom:6px}
   .i-ov p{font-size:12px;color:#bbc0d0;line-height:1.7}
+  .i-meeting-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--hint);font-weight:600;margin-bottom:10px}
+  .i-hero{border-radius:var(--radius);padding:16px 18px;margin-bottom:14px;border-left:4px solid var(--amber)}
+  .i-hero.i-hero-pos{border-left-color:var(--green);background:rgba(62,207,142,.06)}
+  .i-hero.i-hero-neu{border-left-color:var(--amber);background:rgba(245,166,35,.06)}
+  .i-hero.i-hero-neg{border-left-color:var(--red);background:rgba(245,101,101,.06)}
+  .i-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .i-hl-hero{font-size:19px;font-weight:700;letter-spacing:-.4px;line-height:1.35;flex:1;min-width:0}
+  .i-hero-pill{font-size:10px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+  .i-preview{margin:0;padding:0;list-style:none}
+  .i-prev-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.45;color:#c8ccd8;padding:8px 0;border-bottom:.5px solid var(--border)}
+  .i-prev-item:last-child{border-bottom:none}
+  .i-prev-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+  .i-prev-g .i-prev-dot{background:var(--green)}
+  .i-prev-r .i-prev-dot{background:var(--red)}
+  .i-prev-body{flex:1;min-width:0}
+  .i-details-wrap{margin-top:4px}
+  .i-details-wrap details{border:.5px solid var(--border);border-radius:var(--radius);background:var(--surface2);overflow:hidden}
+  .i-details-wrap summary{cursor:pointer;list-style:none;font-size:12px;font-weight:600;color:var(--blue);padding:12px 14px;user-select:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .i-details-wrap summary::-webkit-details-marker{display:none}
+  .i-details-wrap summary::after{content:'+';font-size:14px;color:var(--muted);font-weight:500}
+  .i-details-wrap details[open] summary::after{content:'−'}
+  .i-details-wrap summary:hover{color:var(--text)}
+  .i-details-inner{padding:0 14px 14px;border-top:.5px solid var(--border)}
+  .i-details-inner .i-sm{margin:14px 0 0;font-size:13px;color:#bbc0d0;line-height:1.65}
+  .i-details-inner .i-blk{margin-top:16px}
+  .i-details-inner .i-blk:first-of-type{margin-top:14px}
+  .i-details-inner .i-ov{margin-bottom:0;margin-top:16px}
+  .i-empty-hint{font-size:12px;color:var(--muted);padding:6px 0}
   /* OKR */
   .okr-hdr{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:20px}
   .okr-obj{font-size:15px;font-weight:600;margin-bottom:6px}
@@ -147,9 +218,94 @@
   .pc{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;margin-bottom:10px}
   .pc-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);margin-top:5px;flex-shrink:0}
   .pc-text{font-size:13px;color:#bbc0d0;line-height:1.6}
+  /* MELHORIAS */
+  .imp-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:28px}
+  .imp-kpi{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+  .imp-kpi-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+  .imp-kpi-val{font-size:26px;font-weight:700;letter-spacing:-.5px}
+  .imp-kpi-sub{font-size:11px;color:var(--muted);margin-top:5px}
+  .imp-board{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:12px;overflow-x:auto;padding-bottom:8px}
+  .imp-col{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);display:flex;flex-direction:column;min-height:200px}
+  .imp-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:.5px solid var(--border);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+  .imp-col-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+  .imp-col-count{font-size:11px;font-weight:600;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .imp-col-body{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .imp-col-empty{font-size:12px;color:var(--hint);text-align:center;padding:24px 0}
+  /* column accent colors */
+  .imp-col-amel .imp-col-hdr{background:rgba(245,101,101,.06)}
+  .imp-col-amel .imp-col-title{color:var(--red)}
+  .imp-col-amel .imp-col-count{background:var(--red-bg);color:var(--red)}
+  .imp-col-eprod .imp-col-hdr{background:rgba(245,166,35,.06)}
+  .imp-col-eprod .imp-col-title{color:var(--amber)}
+  .imp-col-eprod .imp-col-count{background:var(--amber-bg);color:var(--amber)}
+  .imp-col-eteste .imp-col-hdr{background:rgba(96,165,250,.06)}
+  .imp-col-eteste .imp-col-title{color:var(--blue)}
+  .imp-col-eteste .imp-col-count{background:var(--blue-bg);color:var(--blue)}
+  .imp-col-fin .imp-col-hdr{background:rgba(62,207,142,.06)}
+  .imp-col-fin .imp-col-title{color:var(--green)}
+  .imp-col-fin .imp-col-count{background:var(--green-bg);color:var(--green)}
+  /* cards */
+  .imp-card{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--radius);padding:12px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;gap:8px}
+  .imp-card:hover{border-color:var(--border2);background:#272b3a}
+  .imp-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .imp-card-title{font-size:12px;font-weight:500;line-height:1.4;flex:1;min-width:0}
+  .imp-card-area{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .imp-card-footer{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .imp-pri{font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}
+  .imp-pri-alta{background:var(--red-bg);color:var(--red)}
+  .imp-pri-media{background:var(--amber-bg);color:var(--amber)}
+  .imp-pri-baixa{background:var(--green-bg);color:var(--green)}
+  .imp-badge-delta{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+  .imp-badge-pos{background:rgba(62,207,142,.15);color:#3ecf8e}
+  .imp-badge-neg{background:rgba(245,101,101,.15);color:#f56565}
+  /* detail dialog */
+  dialog.imp-detail-dlg{border:none;border-radius:var(--radius-lg);padding:0;max-width:min(540px,calc(100vw - 32px));width:100%;background:var(--surface);color:var(--text);box-shadow:0 16px 48px rgba(0,0,0,.55);border:.5px solid var(--border2)}
+  dialog.imp-detail-dlg::backdrop{background:rgba(0,0,0,.6)}
+  .idd-hdr{padding:20px 20px 14px;border-bottom:.5px solid var(--border)}
+  .idd-hdr-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+  .idd-title{font-size:16px;font-weight:600;line-height:1.35;letter-spacing:-.2px;flex:1;min-width:0}
+  .idd-close{width:32px;height:32px;border:none;border-radius:8px;background:var(--surface2);color:var(--muted);font-size:18px;line-height:1;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+  .idd-close:hover{color:var(--text);background:var(--border)}
+  .idd-pills{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .idd-body{padding:18px 20px 22px;overflow-y:auto;max-height:60vh;display:flex;flex-direction:column;gap:16px}
+  .idd-section{display:flex;flex-direction:column;gap:6px}
+  .idd-section-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);font-weight:600}
+  .idd-section-text{font-size:13px;color:#bbc0d0;line-height:1.65;white-space:pre-wrap}
+  .idd-metric{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--radius);padding:14px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center}
+  .idd-metric-cell{display:flex;flex-direction:column;gap:4px}
+  .idd-metric-val{font-size:20px;font-weight:700;letter-spacing:-.3px}
+  .idd-metric-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .idd-metric-delta{font-size:13px;font-weight:700}
+  .imp-toolbar{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+  .imp-toolbar .sec{margin:0;flex:1;min-width:0}
+  .imp-btn-primary{font-size:13px;font-weight:600;padding:10px 18px;border-radius:var(--radius);border:none;cursor:pointer;background:var(--blue);color:#0f1117;white-space:nowrap;transition:opacity .15s,filter .15s}
+  .imp-btn-primary:hover{filter:brightness(1.08)}
+  .imp-btn-primary:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+  .imp-btn-ghost{font-size:12px;font-weight:500;padding:8px 12px;border-radius:var(--radius);border:.5px solid var(--border2);cursor:pointer;background:transparent;color:var(--muted);margin-left:8px}
+  .imp-btn-ghost:hover{color:var(--text);border-color:var(--border2);background:var(--surface2)}
+  dialog.imp-add-dlg{border:none;border-radius:var(--radius-lg);padding:0;max-width:min(520px,calc(100vw - 32px));width:100%;background:var(--surface);color:var(--text);box-shadow:0 16px 48px rgba(0,0,0,.55);border:.5px solid var(--border2)}
+  dialog.imp-add-dlg::backdrop{background:rgba(0,0,0,.6)}
+  .imp-form{padding:0 20px 20px;display:flex;flex-direction:column;gap:14px;max-height:65vh;overflow-y:auto}
+  .imp-form-row{display:flex;flex-direction:column;gap:5px}
+  .imp-form-row label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--hint);font-weight:600}
+  .imp-form-row input,.imp-form-row select,.imp-form-row textarea{font-family:inherit;font-size:13px;padding:10px 12px;border-radius:8px;border:.5px solid var(--border2);background:var(--surface2);color:var(--text)}
+  .imp-form-row textarea{min-height:72px;resize:vertical;line-height:1.5}
+  .imp-form-row input:focus,.imp-form-row select:focus,.imp-form-row textarea:focus{outline:none;border-color:rgba(96,165,250,.5)}
+  .imp-form-hint{font-size:11px;color:var(--muted);line-height:1.45;margin-top:-6px}
+  .imp-form-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding-top:6px;border-top:.5px solid var(--border);margin:0 -20px;padding:16px 20px 0}
+  .imp-form-actions button{font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;cursor:pointer;border:none}
+  .imp-form-cancel{background:var(--surface2);color:var(--muted);border:.5px solid var(--border2)!important}
+  .imp-form-cancel:hover{color:var(--text)}
+  .imp-form-submit{background:var(--blue);color:#0f1117}
+  .idd-hdr-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+  .idd-hdr-actions .imp-btn-ghost{margin:0}
+  .imp-card.imp-dragging{opacity:.55;cursor:grabbing}
+  .imp-col-body.imp-drag-over{outline:2px dashed var(--blue);outline-offset:-4px;background:rgba(96,165,250,.06);border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+  .imp-card-hint{font-size:10px;color:var(--hint);margin-top:4px}
   @media(max-width:700px){
-    .kpis,.okr-kpis,.tgrid3{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .kpis,.okr-kpis,.tgrid3,.imp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
     .grid2,.okr-cards,.i-cols{grid-template-columns:1fr}
+    .imp-board{grid-template-columns:repeat(4,minmax(200px,1fr))}
   }
 </style>
 </head>
@@ -167,31 +323,39 @@
   </div>
 
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('ops')">Operações</button>
-    <button class="tab" onclick="switchTab('okr')">OKRs</button>
-    <button class="tab t-coo" onclick="switchTab('coo')">COO · privado</button>
+    <button type="button" class="tab active" data-tab="ops" onclick="switchTab('ops')">Operações</button>
+    <button type="button" class="tab" data-tab="okr" onclick="switchTab('okr')">OKRs</button>
+    <button type="button" class="tab" data-tab="melhorias" onclick="switchTab('melhorias')">Melhorias</button>
+    <button type="button" class="tab t-coo" data-tab="coo" onclick="switchTab('coo')">COO · privado</button>
   </div>
 
   <!-- ══ TAB OPERAÇÕES ══ -->
   <div id="tab-ops" class="tab-panel active">
     <div class="kpis" id="kpi-block"></div>
 
-    <div class="sec">Tendência — últimas semanas</div>
+    <div class="sec">Burn semanal — últimas semanas</div>
     <div class="chart-card">
       <div class="ch-hdr">
-        <span class="ch-title">Taxa de conclusão &amp; tasks em atraso</span>
+        <div class="ch-title-stack">
+          <div class="ch-title-row">
+            <span class="ch-title">Burn semanal (tarefas criadas na semana)</span>
+            <button type="button" class="help-q help-q-sm" onclick="openMetricHelp('chart_burn_weekly')" aria-label="Como ler este gráfico?">?</button>
+          </div>
+          <span class="ch-sub">Cada ponto é o recorte do Plane na semana: concluídas (burn-up) vs ainda abertas (restante / burn-down).</span>
+        </div>
         <div class="ch-leg">
-          <div class="cl-i"><div class="cl-d" style="background:#3ecf8e"></div>Taxa %</div>
-          <div class="cl-i"><div class="cl-d" style="background:#f56565"></div>Em atraso</div>
+          <div class="cl-i"><div class="cl-d" style="background:#3ecf8e"></div>Concluídas (burn-up)</div>
+          <div class="cl-i"><div class="cl-d" style="background:#f5a623"></div>Abertas / restante</div>
         </div>
       </div>
-      <div style="position:relative;height:180px"><canvas id="trendChart" role="img" aria-label="Tendência semanal de taxa e atrasos">Gráfico de tendência.</canvas></div>
+      <div style="position:relative;height:180px"><canvas id="trendChart" role="img" aria-label="Burn semanal: concluídas versus restantes por semana">Gráfico burn semanal.</canvas></div>
+      <div class="flow-week" id="flow-week-block" aria-live="polite"></div>
     </div>
 
     <div class="sec">Saúde por área</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><td>Área</td><td>Score</td><td>Taxa</td><td>Atrasos</td><td>C.Time</td><td>Backlog</td></tr></thead>
+        <thead><tr><td>Área</td><td><span class="th-help">Score<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_score')" aria-label="O que é Score?">?</button></span></td><td><span class="th-help">Taxa<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_taxa')" aria-label="O que é Taxa?">?</button></span></td><td><span class="th-help">Atrasos<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_atrasos')" aria-label="O que é Atrasos?">?</button></span></td><td><span class="th-help">C.Time<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_cycle_time')" aria-label="O que é C.Time?">?</button></span></td><td><span class="th-help">Backlog<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_backlog')" aria-label="O que é Backlog?">?</button></span></td></tr></thead>
         <tbody id="areas-body"></tbody>
       </table>
     </div>
@@ -207,7 +371,7 @@
       </table>
     </div>
 
-    <div class="sec">Insights da semana</div>
+    <div class="sec">Leitura da semana</div>
     <div class="iw" id="insights-block"></div>
   </div>
 
@@ -251,6 +415,50 @@
     </div>
   </div>
 
+  <!-- ══ TAB MELHORIAS ══ -->
+  <div id="tab-melhorias" class="tab-panel">
+    <div class="imp-toolbar">
+      <div class="sec">Melhorias &amp; processos</div>
+      <div>
+        <button type="button" class="imp-btn-primary" onclick="openImpAddForm()">+ Nova melhoria</button>
+        <button type="button" class="imp-btn-ghost" onclick="exportImprovementsJSON()">Exportar JSON</button>
+      </div>
+    </div>
+    <p class="imp-form-hint" style="margin:-12px 0 18px">O arquivo <code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px">data/improvements.json</code> é a fonte oficial no repositório. Novos cards criados aqui ficam salvos neste navegador até você exportar e colar no JSON.</p>
+    <div class="imp-kpis" id="imp-kpis"></div>
+    <div class="sec">Kanban de iniciativas de melhoria</div>
+    <div class="imp-board">
+      <div class="imp-col imp-col-amel">
+        <div class="imp-col-hdr">
+          <span class="imp-col-title">A melhorar</span>
+          <span class="imp-col-count" id="imp-count-amel">0</span>
+        </div>
+        <div class="imp-col-body" id="imp-col-amel" data-imp-status="a_melhorar"></div>
+      </div>
+      <div class="imp-col imp-col-eprod">
+        <div class="imp-col-hdr">
+          <span class="imp-col-title">Em produção</span>
+          <span class="imp-col-count" id="imp-count-eprod">0</span>
+        </div>
+        <div class="imp-col-body" id="imp-col-eprod" data-imp-status="em_producao"></div>
+      </div>
+      <div class="imp-col imp-col-eteste">
+        <div class="imp-col-hdr">
+          <span class="imp-col-title">Em teste</span>
+          <span class="imp-col-count" id="imp-count-eteste">0</span>
+        </div>
+        <div class="imp-col-body" id="imp-col-eteste" data-imp-status="em_teste"></div>
+      </div>
+      <div class="imp-col imp-col-fin">
+        <div class="imp-col-hdr">
+          <span class="imp-col-title">Finalizado</span>
+          <span class="imp-col-count" id="imp-count-fin">0</span>
+        </div>
+        <div class="imp-col-body" id="imp-col-fin" data-imp-status="finalizado"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ TAB COO ══ -->
   <div id="tab-coo" class="tab-panel">
     <div class="coo-banner">
@@ -264,13 +472,104 @@
   </div>
 </div>
 
+<dialog id="metric-help-dialog" class="metric-help-dlg" aria-labelledby="metric-help-title">
+  <div class="mhd-hdr">
+    <h2 id="metric-help-title" class="mhd-title"></h2>
+    <button type="button" class="mhd-close" onclick="closeMetricHelp()" aria-label="Fechar">×</button>
+  </div>
+  <div id="metric-help-body" class="mhd-body"></div>
+</dialog>
+
+<dialog id="imp-add-dialog" class="imp-add-dlg" aria-labelledby="imp-add-title">
+  <div class="idd-hdr" style="padding-bottom:12px">
+    <div class="idd-hdr-top" style="margin-bottom:0">
+      <h2 id="imp-add-title" class="idd-title">Nova melhoria</h2>
+      <button type="button" class="idd-close" onclick="closeImpAddForm()" aria-label="Fechar">×</button>
+    </div>
+  </div>
+  <form id="imp-add-form" class="imp-form" onsubmit="submitImpAddForm(event)">
+    <div class="imp-form-row">
+      <label for="imp-f-title">Título</label>
+      <input type="text" id="imp-f-title" name="title" required maxlength="200" placeholder="Ex.: Padronizar follow-up de leads" autocomplete="off">
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-area">Área</label>
+      <input type="text" id="imp-f-area" name="area" required maxlength="80" placeholder="Ex.: Comercial" autocomplete="organization">
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-status">Coluna inicial</label>
+      <select id="imp-f-status" name="status" required>
+        <option value="a_melhorar">A melhorar</option>
+        <option value="em_producao">Em produção</option>
+        <option value="em_teste">Em teste</option>
+        <option value="finalizado">Finalizado</option>
+      </select>
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-priority">Prioridade</label>
+      <select id="imp-f-priority" name="priority" required>
+        <option value="alta">Alta</option>
+        <option value="media" selected>Média</option>
+        <option value="baixa">Baixa</option>
+      </select>
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-desc">Lacuna / problema</label>
+      <textarea id="imp-f-desc" name="description" placeholder="Descreva a oportunidade ou o que precisa melhorar."></textarea>
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-plan">Plano de ação</label>
+      <textarea id="imp-f-plan" name="action_plan" placeholder="Passos ou ideias de implementação (opcional)."></textarea>
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-expected">Resultado esperado</label>
+      <textarea id="imp-f-expected" name="expected_result" placeholder="O que você quer ver mudar (opcional)."></textarea>
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-mlabel">Métrica (opcional)</label>
+      <input type="text" id="imp-f-mlabel" name="metric_label" maxlength="120" placeholder="Ex.: Taxa de conversão">
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-munit">Unidade da métrica</label>
+      <input type="text" id="imp-f-munit" name="metric_unit" maxlength="20" placeholder="Ex.: %, d, h">
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-mbefore">Valor antes</label>
+      <input type="text" id="imp-f-mbefore" name="metric_before" inputmode="decimal" placeholder="Deixe vazio se ainda não mediu">
+    </div>
+    <div class="imp-form-row">
+      <label for="imp-f-mafter">Valor depois</label>
+      <input type="text" id="imp-f-mafter" name="metric_after" inputmode="decimal" placeholder="Opcional; preencha ao finalizar">
+    </div>
+    <div class="imp-form-actions">
+      <button type="button" class="imp-form-cancel" onclick="closeImpAddForm()">Cancelar</button>
+      <button type="submit" class="imp-form-submit">Criar card</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="imp-detail-dialog" class="imp-detail-dlg" aria-labelledby="idd-title">
+  <div class="idd-hdr">
+    <div class="idd-hdr-top">
+      <h2 id="idd-title" class="idd-title"></h2>
+      <div class="idd-hdr-actions">
+        <button type="button" class="imp-btn-ghost imp-edit-trigger" onclick="openImpEditForm()">Editar</button>
+        <button type="button" class="idd-close" onclick="closeImpDetail()" aria-label="Fechar">×</button>
+      </div>
+    </div>
+    <div class="idd-pills" id="idd-pills"></div>
+  </div>
+  <div class="idd-body" id="idd-body"></div>
+</dialog>
+
 <script>
 const sOrd={A:4,B:3,C:2,D:1};
 function switchTab(n){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+n).classList.add('active');
-  ['ops','okr','coo'].forEach((v,i)=>{if(v===n) document.querySelectorAll('.tab')[i].classList.add('active')});
+  const tabBtn=document.querySelector('.tab[data-tab="'+n+'"]');
+  if(tabBtn)tabBtn.classList.add('active');
 }
 function sp(s){return`<span class="sp sp-${s.toLowerCase()}"><span class="sp-dot dot-${s.toLowerCase()}"></span>${s}</span>`}
 function sd(a,b){const d=sOrd[b]-sOrd[a];return d>0?`<span class="sarrow up">↑</span>`:d<0?`<span class="sarrow down">↓</span>`:`<span class="sarrow flat">—</span>`}
@@ -278,6 +577,82 @@ function dlt(c,p,inv=false){const d=c-p;if(d===0)return`<span class="flat">—</
 function dltf(c,p,inv=false){if(c==null||p==null)return`<span class="flat">—</span>`;const d=c-p;if(Math.abs(d)<0.05)return`<span class="flat">—</span>`;const g=inv?d<0:d>0;return`<span class="${g?'up':'down'}">${d>0?'+':''}${d.toFixed(1)}d</span>`}
 function bbar(pct,color){const p=Math.min(100,Math.max(0,pct));return`<div class="bw"><div class="bb"><div class="bf" style="width:${p}%;background:${color}"></div></div></div>`}
 function fdt(iso){if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
+function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}
+
+const METRIC_HELP={
+  kpi_rate:{
+    title:'Taxa de conclusão',
+    body:'<p>É a porcentagem de tarefas da semana que já foram marcadas como concluídas no Plane.</p><p><strong>Em uma frase:</strong> mostra se o time está “fechando” o que entrou, ou se muita coisa fica aberta.</p>'
+  },
+  kpi_cycle_time:{
+    title:'Cycle time médio',
+    body:'<p>É o tempo médio (em dias) entre a tarefa ser criada e ser concluída — só contam as que já foram fechadas.</p><p><strong>Em uma frase:</strong> quanto menor, em geral mais rápido o fluxo; número alto pode indicar fila, bloqueio ou tarefas grandes demais.</p>'
+  },
+  kpi_overdue:{
+    title:'Em atraso (+7 dias)',
+    body:'<p>Conta tarefas com data de entrega (due date) já passada, ainda abertas, e que estão atrasadas há mais de 7 dias.</p><p><strong>Em uma frase:</strong> é o “fogo” que precisa de atenção — não é só atraso leve, é atraso relevante.</p>'
+  },
+  kpi_chronic:{
+    title:'Rollover crônico',
+    body:'<p>Conta tarefas que continuam abertas e foram criadas antes da semana anterior — ou seja, “carregam” de uma semana para outra há tempo.</p><p><strong>Em uma frase:</strong> indica itens que viraram hábito no backlog; vale desbloquear, quebrar em partes menores ou decidir cortar.</p>'
+  },
+  col_score:{
+    title:'Score (A, B, C, D)',
+    body:'<p>É uma nota rápida da saúde da área nesta semana, calculada a partir da taxa de conclusão e de quantas tarefas estão atrasadas.</p><p><strong>A</strong> costuma ser “no trilho”; <strong>D</strong> pede conversa e plano. O importante na reunião é a tendência e o porquê, não só a letra.</p>'
+  },
+  col_taxa:{
+    title:'Taxa (por área)',
+    body:'<p>Mesma ideia da taxa geral, mas só para aquela área: quantas tarefas da semana foram concluídas em relação ao total.</p><p>A barra ao lado é um apoio visual para comparar áreas num relance.</p>'
+  },
+  col_atrasos:{
+    title:'Atrasos (por área)',
+    body:'<p>Quantidade de tarefas da área que estão com entrega atrasada (due passado e ainda abertas).</p><p>Não é o mesmo que “+7 dias” do KPI geral — aqui é o total de atrasadas por área para comparar onde o problema concentra.</p>'
+  },
+  col_cycle_time:{
+    title:'C.Time (cycle time por área)',
+    body:'<p>Tempo médio em dias (criação → conclusão) só das tarefas já fechadas naquela área na janela da semana.</p><p><strong>Em uma frase:</strong> ajuda a ver se uma área entrega rápido ou se as coisas “cozinham” muito tempo.</p>'
+  },
+  col_backlog:{
+    title:'Backlog',
+    body:'<p>Número de tarefas ainda abertas na área (não concluídas), independente de terem sido criadas nesta semana ou antes.</p><p><strong>Em uma frase:</strong> quanto o time ainda tem na fila para aquela área.</p>'
+  },
+  chart_burn_weekly:{
+    title:'Burn semanal no dashboard',
+    body:'<p>Cada semana no eixo horizontal é uma “foto” tirada quando o script rodou. Só entram <strong>tarefas criadas naquela semana</strong> no Plane (coorte da semana — não é o backlog inteiro).</p><p>A linha <strong>verde (burn-up)</strong> mostra quantas dessas tarefas do coorte já foram <strong>marcadas como concluídas</strong>. A linha <strong>âmbar tracejada</strong> mostra quantas <strong>ainda estão abertas</strong> naquele recorte.</p><p><strong>Abaixo do gráfico</strong> o bloco <strong>Fluxo da semana</strong> responde a outra pergunta: quantas tarefas <strong>entraram</strong> na semana (criadas) versus quantas <strong>fecharam</strong> na semana (por data de conclusão, de qualquer época). O <strong>saldo</strong> é criadas − concluídas.</p>'
+  },
+  flow_weekly:{
+    title:'Fluxo da semana (criadas vs concluídas)',
+    body:'<p><strong>Criadas na semana:</strong> issues com <code>created_at</code> na semana corrente (mesma janela do recorte “esta semana” do script).</p><p><strong>Concluídas na semana:</strong> issues com <code>completed_at</code> na semana — <em>inclui tarefas criadas antes</em>, ou seja, tudo o que o time fechou nesta semana.</p><p><strong>Saldo</strong> = criadas − concluídas. <strong>Negativo</strong> (ex.: −17) significa que fecharam mais do que abriram novas na semana — em geral bom sinal para a fila. <strong>Positivo</strong> significa que entrou mais trabalho novo do que saiu concluído na semana.</p><p>Isto é independente das linhas do gráfico acima, que olham só o coorte “criadas naquela semana”.</p>'
+  }
+};
+function openMetricHelp(key){
+  const cfg=METRIC_HELP[key];
+  const d=document.getElementById('metric-help-dialog');
+  if(!cfg||!d)return;
+  document.getElementById('metric-help-title').textContent=cfg.title;
+  document.getElementById('metric-help-body').innerHTML=cfg.body;
+  d.showModal();
+}
+function closeMetricHelp(){
+  const d=document.getElementById('metric-help-dialog');
+  if(d)d.close();
+}
+document.getElementById('metric-help-dialog')?.addEventListener('click',function(e){
+  if(e.target===this)closeMetricHelp();
+});
+
+function buildInsightPreview(alerts,highs,maxN){
+  const preview=[];let ai=0,hi=0;let preferAlert=true;
+  while(preview.length<maxN&&(ai<alerts.length||hi<highs.length)){
+    if(preferAlert&&ai<alerts.length){preview.push({kind:'r',text:alerts[ai++]});preferAlert=false;continue}
+    if(!preferAlert&&hi<highs.length){preview.push({kind:'g',text:highs[hi++]});preferAlert=true;continue}
+    if(ai<alerts.length){preview.push({kind:'r',text:alerts[ai++]});preferAlert=false;continue}
+    if(hi<highs.length){preview.push({kind:'g',text:highs[hi++]});preferAlert=true;continue}
+    break
+  }
+  return{preview,restAlerts:alerts.slice(ai),restHighs:highs.slice(hi)}
+}
 
 function renderOps(data){
   const C=data.current,P=data.previous,ins=data.insights;
@@ -289,16 +664,16 @@ function renderOps(data){
   document.getElementById('updated-at').textContent='Atualizado '+fdt(data.generated_at);
 
   document.getElementById('kpi-block').innerHTML=`
-    <div class="kpi"><div class="kpi-label">Taxa de conclusão</div>
+    <div class="kpi"><div class="kpi-label-row"><div class="kpi-label">Taxa de conclusão</div><button type="button" class="help-q" onclick="openMetricHelp('kpi_rate')" aria-label="O que é taxa de conclusão?">?</button></div>
       <div class="kpi-value ${C.rate>=85?'kv-g':C.rate>=70?'kv-a':'kv-r'}">${C.rate}%</div>
       <div class="kpi-delta">${dlt(C.rate,P.rate)} <span class="flat">vs sem. ant. (${P.rate}%)</span></div></div>
-    <div class="kpi"><div class="kpi-label">Cycle time médio</div>
+    <div class="kpi"><div class="kpi-label-row"><div class="kpi-label">Cycle time médio</div><button type="button" class="help-q" onclick="openMetricHelp('kpi_cycle_time')" aria-label="O que é cycle time médio?">?</button></div>
       <div class="kpi-value ${(C.avg_cycle_time||0)<=7?'kv-g':(C.avg_cycle_time||0)<=12?'kv-a':'kv-r'}">${C.avg_cycle_time??'—'}d</div>
       <div class="kpi-delta">${dltf(C.avg_cycle_time,P.avg_cycle_time,true)} <span class="flat">vs sem. ant. (${P.avg_cycle_time??'—'}d)</span></div></div>
-    <div class="kpi"><div class="kpi-label">Em atraso (+7d)</div>
+    <div class="kpi"><div class="kpi-label-row"><div class="kpi-label">Em atraso (+7d)</div><button type="button" class="help-q" onclick="openMetricHelp('kpi_overdue')" aria-label="O que é em atraso (+7d)?">?</button></div>
       <div class="kpi-value ${C.overdue===0?'kv-g':C.overdue<=3?'kv-a':'kv-r'}">${C.overdue}</div>
       <div class="kpi-delta">${dlt(C.overdue,P.overdue,true)} <span class="flat">vs sem. ant. (${P.overdue})</span></div></div>
-    <div class="kpi"><div class="kpi-label">Rollover crônico</div>
+    <div class="kpi"><div class="kpi-label-row"><div class="kpi-label">Rollover crônico</div><button type="button" class="help-q" onclick="openMetricHelp('kpi_chronic')" aria-label="O que é rollover crônico?">?</button></div>
       <div class="kpi-value ${C.chronic_rollover===0?'kv-g':C.chronic_rollover<=1?'kv-a':'kv-r'}">${C.chronic_rollover}</div>
       <div class="kpi-delta">${dlt(C.chronic_rollover,P.chronic_rollover,true)} <span class="flat">vs sem. ant. (${P.chronic_rollover})</span></div></div>`;
 
@@ -324,20 +699,28 @@ function renderOps(data){
     const bl=sev==='critical'?'crônico':sev==='warn'?'atenção':'ok';
     const ob=c.overloaded?`<span class="badge bd-ov" style="margin-left:4px">sobrecarga</span>`:'';
     const odf=(c.overdue||[]).filter(o=>o.days>=7);
-    const odh=odf.length?`<div class="od-mini">${odf.slice(0,2).map(o=>`
-      <div class="od-item">
-        <span class="od-title">${o.title}</span>
-        <span class="od-days" style="color:${o.days>=14?'var(--red)':'var(--amber)'}">${o.days}d</span>
-      </div>`).join('')}${odf.length>2?`<div style="font-size:10px;color:var(--hint);margin-top:4px">+${odf.length-2} mais</div>`:''}</div>`:'';
-    return`<div class="${cc2}">
-      <div class="cc-top">
-        <div><div class="cc-name">${c.name}</div><div class="cc-area">${c.areas.join(', ')}</div></div>
+    const nameEsc=esc(c.name);
+    const areasEsc=esc((c.areas||[]).join(', '));
+    const head=`<div class="cc-top">
+        <div><div class="cc-name">${nameEsc}</div><div class="cc-area">${areasEsc}</div></div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end"><span class="badge ${bc}">${bl}</span>${ob}</div>
       </div>
       <div class="cc-row"><span>Tasks abertas</span><strong style="color:${c.overloaded?'var(--blue)':'var(--text)'}">${c.tasks-c.done}</strong></div>
       <div class="cc-row"><span>Taxa de conclusão</span><strong style="color:${c.rate>=80?'var(--green)':c.rate>=60?'var(--amber)':'var(--red)'}">${c.rate}%</strong></div>
-      <div class="cc-row"><span>Atrasos (+7d)</span><strong style="color:${odf.length>0?'var(--red)':'var(--green)'}">${odf.length}</strong></div>
-      ${odh}</div>`;
+      <div class="cc-row"><span>Atrasos (+7d)</span><strong style="color:${odf.length>0?'var(--red)':'var(--green)'}">${odf.length}</strong></div>`;
+    if(odf.length){
+      const panel=`<div class="cc-od-panel"><div class="cc-od-panel-hdr">Tarefas em atraso (+7 dias)</div>${odf.map(o=>`
+        <div class="od-item od-item-full">
+          <div class="od-item-text">
+            <div class="od-title-full">${esc(o.title)}</div>
+            ${o.area?`<div class="od-area">${esc(o.area)}</div>`:''}
+          </div>
+          <span class="od-days" style="color:${o.days>=14?'var(--red)':'var(--amber)'}">${o.days}d</span>
+        </div>`).join('')}</div>`;
+      const hint=`<div class="cc-expand-hint" aria-hidden="true"><span class="cc-chev">▸</span> Clique para ver ${odf.length===1?'a tarefa':'as '+odf.length+' tarefas'} em atraso</div>`;
+      return`<details class="cc-expand ${cc2}"><summary aria-label="Expandir ou recolher tarefas em atraso (+7 dias) desta pessoa">${head}${hint}</summary>${panel}</details>`;
+    }
+    return`<div class="${cc2}">${head}</div>`;
   }).join('');
 
   const od7=(C.overdue_tasks||[]).filter(t=>t.days>=7);
@@ -349,32 +732,103 @@ function renderOps(data){
       <td class="dim" style="text-align:right">${(t.assignees||[]).join(', ')}</td></tr>`).join('')
     :`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px">Nenhuma task com mais de 7 dias de atraso</td></tr>`;
 
-  const hl=(ins.highlights||[]).map(h=>`<li>${h}</li>`).join('');
-  const al=(ins.alerts||[]).map(a=>`<li>${a}</li>`).join('');
-  const pr=(ins.projections||[]).map(p=>`<li>${p}</li>`).join('');
+  const alerts=ins.alerts||[];
+  const highs=ins.highlights||[];
+  const {preview,restAlerts,restHighs}=buildInsightPreview(alerts,highs,3);
+  const summaryStr=ins.summary!=null?String(ins.summary):'';
+  const overloadStr=ins.overload_analysis!=null?String(ins.overload_analysis):'';
+  const hasProjections=(ins.projections||[]).length>0;
+  const hasMoreLists=restHighs.length>0||restAlerts.length>0;
+  const hlRest=restHighs.map(h=>`<li>${esc(h)}</li>`).join('');
+  const alRest=restAlerts.map(a=>`<li>${esc(a)}</li>`).join('');
+  const pr=(ins.projections||[]).map(p=>`<li>${esc(p)}</li>`).join('');
+  const innerParts=[];
+  if(summaryStr.trim())innerParts.push(`<div class="i-sm">${esc(summaryStr)}</div>`);
+  if(hasMoreLists){
+    if(restHighs.length)innerParts.push(`<div class="i-blk"><h3>Demais destaques</h3><ul class="il g">${hlRest}</ul></div>`);
+    if(restAlerts.length)innerParts.push(`<div class="i-blk"><h3>Demais alertas</h3><ul class="il r">${alRest}</ul></div>`);
+  }
+  if(overloadStr.trim())innerParts.push(`<div class="i-ov"><h3>Análise de carga do time</h3><p>${esc(overloadStr)}</p></div>`);
+  if(hasProjections)innerParts.push(`<div class="i-blk"><h3>Projeções para próxima semana</h3><ul class="il a">${pr}</ul></div>`);
+  const hasDetailsInner=innerParts.length>0;
+  const heroCls={positivo:'i-hero-pos',neutro:'i-hero-neu',negativo:'i-hero-neg'}[ins.status]||'i-hero-neu';
+  const pillCls={positivo:'pill-pos',neutro:'pill-neu',negativo:'pill-neg'}[ins.status]||'pill-neu';
+  const pillTxt={positivo:'Semana positiva',neutro:'Semana neutra',negativo:'Atenção requerida'}[ins.status]||'—';
+  let prevHtml;
+  if(preview.length){
+    prevHtml=`<ul class="i-preview" role="list">${preview.map(p=>`<li class="i-prev-item i-prev-${p.kind==='r'?'r':'g'}"><span class="i-prev-dot" aria-hidden="true"></span><span class="i-prev-body">${esc(p.text)}</span></li>`).join('')}</ul>`;
+  }else if(!alerts.length&&!highs.length){
+    prevHtml=hasDetailsInner
+      ?`<p class="i-empty-hint">Resumo e análises em “Ver contexto completo”.</p>`
+      :`<p class="i-empty-hint">Sem bullets nesta rodada.</p>`;
+  }else{
+    prevHtml=`<p class="i-empty-hint">Sem leitura rápida.</p>`;
+  }
+  const detailsBlock=hasDetailsInner?`<div class="i-details-wrap"><details>
+    <summary>Ver contexto completo</summary>
+    <div class="i-details-inner">${innerParts.join('')}</div>
+  </details></div>`:'';
   document.getElementById('insights-block').innerHTML=`
-    <div class="i-hl">${ins.headline}</div>
-    <div class="i-sm">${ins.summary}</div>
-    <div class="i-cols">
-      <div class="i-blk"><h3>Destaques positivos</h3><ul class="il g">${hl}</ul></div>
-      <div class="i-blk"><h3>Alertas e riscos</h3><ul class="il r">${al}</ul></div>
+    <div class="i-meeting-lbl">Para a reunião</div>
+    <div class="i-hero ${heroCls}">
+      <div class="i-hero-top">
+        <div class="i-hl-hero">${esc(ins.headline||'—')}</div>
+        <span class="i-hero-pill status-pill ${pillCls}">${esc(pillTxt)}</span>
+      </div>
+      ${prevHtml}
     </div>
-    <div class="i-ov"><h3>Análise de carga do time</h3><p>${ins.overload_analysis}</p></div>
-    <div class="i-blk"><h3>Projeções para próxima semana</h3><ul class="il a">${pr}</ul></div>`;
+    ${detailsBlock}`;
 
   const tr=data.trend||[];
+  const cw=C.created_week,cmp=C.completed_week,bal=C.balance_week;
+  const hasFlow=cw!=null&&cmp!=null&&bal!=null;
+  const balCls=hasFlow?(bal>0?'flow-week-val-bal-pos':'flow-week-val-bal-neg'):'';
+  const balStr=hasFlow?((bal>0?'+':'')+bal):'';
+  document.getElementById('flow-week-block').innerHTML=hasFlow
+    ?`<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px;width:100%">
+        <div class="flow-week-hdr"><span class="flow-week-title">Fluxo da semana</span><button type="button" class="help-q help-q-sm" onclick="openMetricHelp('flow_weekly')" aria-label="O que é fluxo da semana?">?</button></div>
+        <div class="flow-week-item"><span class="flow-week-lbl">Criadas</span><span class="flow-week-val">${cw}</span></div>
+        <div class="flow-week-item"><span class="flow-week-lbl">Concluídas</span><span class="flow-week-val">${cmp}</span></div>
+        <div class="flow-week-item"><span class="flow-week-lbl">Saldo</span><span class="flow-week-val ${balCls}">${balStr}</span></div>
+      </div>
+      <p class="flow-week-sub">Saldo = criadas − concluídas. Negativo: fechamos mais do que abrimos de novo nesta semana. Positivo: entrou mais trabalho novo do que saiu concluído.</p>`
+    :`<p class="flow-week-sub" style="margin:0">Atualize o <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">fetch_metrics.py</code> e regenere <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">data/latest.json</code> para ver criadas, concluídas e saldo.</p>`;
+
+  function trendDone(t){
+    const n=Number(t.done);
+    return Number.isFinite(n)?n:0;
+  }
+  function trendRemaining(t){
+    const r=Number(t.remaining);
+    if(Number.isFinite(r))return Math.max(0,r);
+    const tot=Number(t.total),dn=Number(t.done);
+    if(Number.isFinite(tot)&&Number.isFinite(dn))return Math.max(0,tot-dn);
+    return 0;
+  }
   new Chart(document.getElementById('trendChart'),{
     type:'line',
     data:{labels:tr.map(t=>t.week),datasets:[
-      {data:tr.map(t=>t.rate),borderColor:'#3ecf8e',backgroundColor:'rgba(62,207,142,.08)',tension:.35,pointRadius:4,pointBackgroundColor:'#3ecf8e',fill:true,yAxisID:'y'},
-      {data:tr.map(t=>t.overdue),borderColor:'#f56565',backgroundColor:'transparent',tension:.35,pointRadius:4,pointBackgroundColor:'#f56565',borderDash:[4,3],yAxisID:'y2'}
+      {label:'Concluídas',data:tr.map(trendDone),borderColor:'#3ecf8e',backgroundColor:'rgba(62,207,142,.08)',tension:.35,pointRadius:4,pointBackgroundColor:'#3ecf8e',fill:true},
+      {label:'Abertas',data:tr.map(trendRemaining),borderColor:'#f5a623',backgroundColor:'transparent',tension:.35,pointRadius:4,pointBackgroundColor:'#f5a623',borderDash:[5,4]}
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false}},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{afterBody(items){
+          const i=items[0]?.dataIndex;
+          if(i==null)return[];
+          const t=tr[i];
+          if(!t||t.created_week==null)return[];
+          const lines=[];
+          if(t.created_week!=null)lines.push('Criadas (semana): '+t.created_week);
+          if(t.completed_week!=null)lines.push('Concluídas (semana): '+t.completed_week);
+          if(t.balance_week!=null)lines.push('Saldo: '+(t.balance_week>0?'+':'')+t.balance_week);
+          return lines;
+        }}}
+      },
       scales:{
         x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7b8099',font:{size:11}}},
-        y:{position:'left',min:0,max:100,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#3ecf8e',font:{size:11},callback:v=>v+'%'}},
-        y2:{position:'right',min:0,grid:{display:false},ticks:{color:'#f56565',font:{size:11}}}
+        y:{position:'left',beginAtZero:true,min:0,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7b8099',font:{size:11},precision:0,stepSize:1}}
       }}
   });
 }
@@ -446,6 +900,459 @@ function defOKR(){
   };
 }
 
+// ── MELHORIAS ──────────────────────────────────────────────────────────────
+let _impData=[];
+let _impRemote=[];
+let _impDetailOpenId=null;
+let _suppressImpCardClick=false;
+const IMP_LS_KEY='beemessage_improvements_local';
+const IMP_OVR_KEY='beemessage_improvements_overrides';
+
+function loadLocalAdds(){
+  try{
+    const raw=localStorage.getItem(IMP_LS_KEY);
+    if(!raw)return[];
+    const j=JSON.parse(raw);
+    return Array.isArray(j)?j:[];
+  }catch(_){return[]}
+}
+function saveLocalAdds(arr){
+  localStorage.setItem(IMP_LS_KEY,JSON.stringify(arr));
+}
+function loadImpOverrides(){
+  try{
+    const raw=localStorage.getItem(IMP_OVR_KEY);
+    if(!raw)return{};
+    const j=JSON.parse(raw);
+    return j&&typeof j==='object'&&!Array.isArray(j)?j:{};
+  }catch(_){return{}}
+}
+function saveImpOverrides(o){
+  localStorage.setItem(IMP_OVR_KEY,JSON.stringify(o));
+}
+function isLocalImpId(id){
+  return String(id).indexOf('imp-local-')===0;
+}
+function buildMergedList(){
+  const ovr=loadImpOverrides();
+  return _impRemote.map(r=>Object.assign({},r,ovr[r.id]||{})).concat(loadLocalAdds());
+}
+function mergeAndRender(){
+  renderImprovements(buildMergedList());
+}
+function patchImp(id,patch){
+  const today=new Date().toISOString().slice(0,10);
+  const next={...patch,updated_at:today};
+  if(isLocalImpId(id)){
+    const arr=loadLocalAdds();
+    const i=arr.findIndex(x=>x.id===id);
+    if(i>=0){arr[i]=Object.assign({},arr[i],next);saveLocalAdds(arr);}
+  }else{
+    const ovr=loadImpOverrides();
+    ovr[id]=Object.assign({},ovr[id]||{},next);
+    saveImpOverrides(ovr);
+  }
+  mergeAndRender();
+  const dlg=document.getElementById('imp-detail-dialog');
+  if(dlg&&dlg.open&&_impDetailOpenId===id&&!document.getElementById('imp-edit-form')){
+    const imp=_impData.find(i=>i.id===id);
+    if(imp){
+      fillImpDetailHeader(imp);
+      document.getElementById('idd-body').innerHTML=impDetailBodyHTML(imp);
+    }
+  }
+}
+function parseImpNum(v){
+  const s=String(v??'').trim();
+  if(s==='')return null;
+  const n=Number(s.replace(',','.'));
+  return Number.isFinite(n)?n:null;
+}
+function openImpAddForm(){
+  const f=document.getElementById('imp-add-form');
+  f.reset();
+  document.getElementById('imp-f-status').value='a_melhorar';
+  document.getElementById('imp-f-priority').value='media';
+  const dlg=document.getElementById('imp-add-dialog');
+  dlg.showModal();
+  dlg.addEventListener('click',function closeAddBackdrop(ev){
+    if(ev.target===dlg){dlg.close();dlg.removeEventListener('click',closeAddBackdrop);}
+  });
+}
+function closeImpAddForm(){
+  document.getElementById('imp-add-dialog').close();
+}
+function submitImpAddForm(e){
+  e.preventDefault();
+  const fd=new FormData(e.target);
+  const today=new Date().toISOString().slice(0,10);
+  const mLabel=(fd.get('metric_label')||'').toString().trim();
+  const obj={
+    id:'imp-local-'+Date.now(),
+    title:(fd.get('title')||'').toString().trim(),
+    area:(fd.get('area')||'').toString().trim(),
+    status:fd.get('status'),
+    priority:fd.get('priority'),
+    created_at:today,
+    updated_at:today,
+    description:(fd.get('description')||'').toString().trim(),
+    action_plan:(fd.get('action_plan')||'').toString().trim(),
+    expected_result:(fd.get('expected_result')||'').toString().trim(),
+    metric_label:mLabel||null,
+    metric_unit:(fd.get('metric_unit')||'').toString().trim(),
+    metric_before:parseImpNum(fd.get('metric_before')),
+    metric_after:parseImpNum(fd.get('metric_after'))
+  };
+  const arr=loadLocalAdds();
+  arr.push(obj);
+  saveLocalAdds(arr);
+  mergeAndRender();
+  closeImpAddForm();
+}
+function exportImprovementsJSON(){
+  const merged=buildMergedList();
+  const blob=new Blob([JSON.stringify({improvements:merged},null,2)],{type:'application/json;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='improvements.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+
+const IMP_STATUS_META={
+  a_melhorar:{col:'amel',label:'A melhorar'},
+  em_producao:{col:'eprod',label:'Em produção'},
+  em_teste:   {col:'eteste',label:'Em teste'},
+  finalizado: {col:'fin',  label:'Finalizado'}
+};
+const IMP_STATUS_COLORS={
+  a_melhorar:'var(--red)',em_producao:'var(--amber)',
+  em_teste:'var(--blue)',finalizado:'var(--green)'
+};
+const IMP_STATUS_BG={
+  a_melhorar:'var(--red-bg)',em_producao:'var(--amber-bg)',
+  em_teste:'var(--blue-bg)',finalizado:'var(--green-bg)'
+};
+
+function impDelta(imp){
+  if(imp.metric_before==null||imp.metric_after==null)return null;
+  const d=imp.metric_after-imp.metric_before;
+  return{val:d,unit:imp.metric_unit||''};
+}
+
+function renderImprovements(list){
+  _impData=list;
+  const cols={a_melhorar:[],em_producao:[],em_teste:[],finalizado:[]};
+  list.forEach(i=>{if(cols[i.status])cols[i.status].push(i)});
+
+  // KPI strip
+  const total=list.length;
+  const running=(cols.em_producao.length+cols.em_teste.length);
+  const withResult=cols.finalizado.filter(i=>i.metric_after!=null).length;
+  const finTotal=cols.finalizado.length;
+  document.getElementById('imp-kpis').innerHTML=`
+    <div class="imp-kpi">
+      <div class="imp-kpi-lbl">Total de iniciativas</div>
+      <div class="imp-kpi-val">${total}</div>
+      <div class="imp-kpi-sub">${finTotal} finalizada${finTotal!==1?'s':''}</div>
+    </div>
+    <div class="imp-kpi">
+      <div class="imp-kpi-lbl">Em execução</div>
+      <div class="imp-kpi-val" style="color:var(--amber)">${running}</div>
+      <div class="imp-kpi-sub">${cols.em_producao.length} em produção · ${cols.em_teste.length} em teste</div>
+    </div>
+    <div class="imp-kpi">
+      <div class="imp-kpi-lbl">Resultado medido</div>
+      <div class="imp-kpi-val" style="color:var(--green)">${withResult}</div>
+      <div class="imp-kpi-sub">de ${finTotal} finalizada${finTotal!==1?'s':''}</div>
+    </div>`;
+
+  // Columns
+  Object.entries(cols).forEach(([status,items])=>{
+    const meta=IMP_STATUS_META[status];
+    document.getElementById('imp-count-'+meta.col).textContent=items.length;
+    document.getElementById('imp-col-'+meta.col).innerHTML=items.length
+      ? items.map(i=>impCardHTML(i)).join('')
+      : `<div class="imp-col-empty">Nenhuma iniciativa</div>`;
+  });
+  initImpDnDOnce();
+}
+
+function initImpDnDOnce(){
+  const board=document.querySelector('#tab-melhorias .imp-board');
+  if(!board||board.dataset.dndInit)return;
+  board.dataset.dndInit='1';
+  board.addEventListener('dragover',e=>{
+    e.preventDefault();
+    const col=e.target.closest('.imp-col-body');
+    document.querySelectorAll('#tab-melhorias .imp-col-body').forEach(c=>c.classList.toggle('imp-drag-over',c===col));
+  });
+  board.addEventListener('drop',e=>{
+    e.preventDefault();
+    document.querySelectorAll('#tab-melhorias .imp-col-body').forEach(c=>c.classList.remove('imp-drag-over'));
+    const col=e.target.closest('.imp-col-body');
+    if(!col)return;
+    const id=e.dataTransfer.getData('text/plain');
+    const status=col.getAttribute('data-imp-status');
+    if(!id||!status)return;
+    const imp=_impData.find(i=>i.id===id);
+    if(imp&&imp.status!==status)patchImp(id,{status});
+  });
+  board.addEventListener('dragend',()=>{
+    document.querySelectorAll('#tab-melhorias .imp-col-body').forEach(c=>c.classList.remove('imp-drag-over'));
+  },true);
+  board.addEventListener('click',e=>{
+    const card=e.target.closest('.imp-card');
+    if(!card)return;
+    if(_suppressImpCardClick)return;
+    const id=card.getAttribute('data-imp-id');
+    if(!id)return;
+    // #region agent log
+    fetch('http://127.0.0.1:7650/ingest/ef7ce364-fe19-41f4-bdba-a7bb75014096',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'11783c'},body:JSON.stringify({sessionId:'11783c',location:'index.html:impBoardClick',message:'delegated card click',data:{id,suppress:false},hypothesisId:'A',timestamp:Date.now(),runId:'verify'})}).catch(()=>{});
+    // #endregion
+    openImpDetail(id);
+  });
+  board.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'&&e.key!==' ')return;
+    const card=e.target.closest('.imp-card');
+    if(!card)return;
+    e.preventDefault();
+    const id=card.getAttribute('data-imp-id');
+    if(id)openImpDetail(id);
+  });
+}
+
+function impCardDragStart(ev){
+  ev.dataTransfer.effectAllowed='move';
+  ev.dataTransfer.setData('text/plain',ev.currentTarget.getAttribute('data-imp-id'));
+  ev.currentTarget.classList.add('imp-dragging');
+}
+function impCardDragEnd(ev){
+  ev.currentTarget.classList.remove('imp-dragging');
+  document.querySelectorAll('#tab-melhorias .imp-col-body').forEach(c=>c.classList.remove('imp-drag-over'));
+  _suppressImpCardClick=true;
+  requestAnimationFrame(()=>setTimeout(()=>{_suppressImpCardClick=false},80));
+}
+
+function impCardHTML(imp){
+  const priClass='imp-pri-'+(imp.priority||'media');
+  const priLabel={alta:'Alta',media:'Média',baixa:'Baixa'}[imp.priority]||imp.priority||'Média';
+  const delta=impDelta(imp);
+  let deltaBadge='';
+  if(delta){
+    const pos=delta.val>=0;
+    const sign=pos?'+':'';
+    deltaBadge=`<span class="imp-badge-delta ${pos?'imp-badge-pos':'imp-badge-neg'}">${sign}${Number.isInteger(delta.val)?delta.val:delta.val.toFixed(1)}${delta.unit}</span>`;
+  }
+  return`<div class="imp-card" draggable="true" data-imp-id="${escAttr(imp.id)}" role="button" tabindex="0"
+    aria-label="Ver detalhes: ${esc(imp.title)}. Arraste para mudar de coluna."
+    ondragstart="impCardDragStart(event)" ondragend="impCardDragEnd(event)">
+    <div class="imp-card-top">
+      <span class="imp-card-title">${esc(imp.title)}</span>
+    </div>
+    <div class="imp-card-area">${esc(imp.area)}</div>
+    <div class="imp-card-footer">
+      <span class="imp-pri ${priClass}">${priLabel}</span>
+      ${deltaBadge}
+    </div>
+    <div class="imp-card-hint">Arrastar para mover</div>
+  </div>`;
+}
+
+function impDetailMetricHTML(imp){
+  const delta=impDelta(imp);
+  if(!imp.metric_label)return'';
+  const bef=imp.metric_before!=null?`${imp.metric_before}${imp.metric_unit||''}`:'—';
+  const aft=imp.metric_after!=null?`${imp.metric_after}${imp.metric_unit||''}`:'aguardando';
+  let deltaHTML='<span style="color:var(--muted)">—</span>';
+  if(delta){
+    const pos=delta.val>=0;
+    const sign=pos?'+':'';
+    const val=Number.isInteger(delta.val)?delta.val:delta.val.toFixed(1);
+    deltaHTML=`<span class="idd-metric-delta" style="color:${pos?'var(--green)':'var(--red)'}">${sign}${val}${delta.unit}</span>`;
+  }
+  return`<div class="idd-section">
+    <span class="idd-section-lbl">Mensuração — ${esc(imp.metric_label)}</span>
+    <div class="idd-metric">
+      <div class="idd-metric-cell"><div class="idd-metric-val" style="color:var(--muted)">${esc(bef)}</div><div class="idd-metric-lbl">Antes</div></div>
+      <div class="idd-metric-cell">${deltaHTML}<div class="idd-metric-lbl">Variação</div></div>
+      <div class="idd-metric-cell"><div class="idd-metric-val" style="color:${imp.metric_after!=null?'var(--green)':'var(--hint)'}">${esc(aft)}</div><div class="idd-metric-lbl">Depois</div></div>
+    </div>
+  </div>`;
+}
+
+function impDetailBodyHTML(imp){
+  return`
+    <div class="idd-section">
+      <span class="idd-section-lbl">Lacuna / problema</span>
+      <p class="idd-section-text">${esc(imp.description||'—')}</p>
+    </div>
+    <div class="idd-section">
+      <span class="idd-section-lbl">Plano de ação</span>
+      <p class="idd-section-text">${esc(imp.action_plan||'—')}</p>
+    </div>
+    <div class="idd-section">
+      <span class="idd-section-lbl">Resultado esperado</span>
+      <p class="idd-section-text">${esc(imp.expected_result||'—')}</p>
+    </div>
+    ${impDetailMetricHTML(imp)}`;
+}
+
+function selOpt(val,cur){return val===cur?' selected':''}
+
+function impEditFormHTML(imp){
+  const st=imp.status||'a_melhorar';
+  const pr=imp.priority||'media';
+  const mb=imp.metric_before!=null?String(imp.metric_before):'';
+  const ma=imp.metric_after!=null?String(imp.metric_after):'';
+  return`<form id="imp-edit-form" class="imp-form" style="padding:0;max-height:none" onsubmit="submitImpEditForm(event)">
+    <div class="imp-form-row">
+      <label for="iedit-title">Título</label>
+      <input type="text" id="iedit-title" name="title" required maxlength="200" value="${escAttr(imp.title)}">
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-area">Área</label>
+      <input type="text" id="iedit-area" name="area" required maxlength="80" value="${escAttr(imp.area)}">
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-status">Coluna</label>
+      <select id="iedit-status" name="status" required>
+        <option value="a_melhorar"${selOpt('a_melhorar',st)}>A melhorar</option>
+        <option value="em_producao"${selOpt('em_producao',st)}>Em produção</option>
+        <option value="em_teste"${selOpt('em_teste',st)}>Em teste</option>
+        <option value="finalizado"${selOpt('finalizado',st)}>Finalizado</option>
+      </select>
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-priority">Prioridade</label>
+      <select id="iedit-priority" name="priority" required>
+        <option value="alta"${selOpt('alta',pr)}>Alta</option>
+        <option value="media"${selOpt('media',pr)}>Média</option>
+        <option value="baixa"${selOpt('baixa',pr)}>Baixa</option>
+      </select>
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-desc">Lacuna / problema</label>
+      <textarea id="iedit-desc" name="description">${esc(imp.description||'')}</textarea>
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-plan">Plano de ação</label>
+      <textarea id="iedit-plan" name="action_plan">${esc(imp.action_plan||'')}</textarea>
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-expected">Resultado esperado</label>
+      <textarea id="iedit-expected" name="expected_result">${esc(imp.expected_result||'')}</textarea>
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-mlabel">Métrica (opcional)</label>
+      <input type="text" id="iedit-mlabel" name="metric_label" maxlength="120" value="${escAttr(imp.metric_label||'')}">
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-munit">Unidade</label>
+      <input type="text" id="iedit-munit" name="metric_unit" maxlength="20" value="${escAttr(imp.metric_unit||'')}">
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-mbefore">Valor antes</label>
+      <input type="text" id="iedit-mbefore" name="metric_before" inputmode="decimal" value="${escAttr(mb)}">
+    </div>
+    <div class="imp-form-row">
+      <label for="iedit-mafter">Valor depois</label>
+      <input type="text" id="iedit-mafter" name="metric_after" inputmode="decimal" value="${escAttr(ma)}">
+    </div>
+    <p class="imp-form-hint">Alterações em cards do arquivo JSON ficam salvas neste navegador (sobreposição). Use Exportar JSON para atualizar o repositório.</p>
+    <div class="imp-form-actions">
+      <button type="button" class="imp-form-cancel" onclick="cancelImpEdit()">Cancelar</button>
+      <button type="submit" class="imp-form-submit">Salvar</button>
+    </div>
+  </form>`;
+}
+
+function fillImpDetailHeader(imp){
+  document.getElementById('idd-title').textContent=imp.title;
+  const statusMeta=IMP_STATUS_META[imp.status]||{label:imp.status};
+  const sc=IMP_STATUS_COLORS[imp.status]||'var(--muted)';
+  const sbg=IMP_STATUS_BG[imp.status]||'var(--surface2)';
+  const priLabel={alta:'Alta',media:'Média',baixa:'Baixa'}[imp.priority]||imp.priority||'Média';
+  const priColor={alta:'var(--red)',media:'var(--amber)',baixa:'var(--green)'}[imp.priority]||'var(--muted)';
+  const priBg={alta:'var(--red-bg)',media:'var(--amber-bg)',baixa:'var(--green-bg)'}[imp.priority]||'var(--surface2)';
+  document.getElementById('idd-pills').innerHTML=
+    `<span class="badge" style="background:${sbg};color:${sc}">${esc(statusMeta.label)}</span>`+
+    `<span class="badge" style="background:${priBg};color:${priColor}">${priLabel}</span>`+
+    `<span style="font-size:11px;color:var(--hint)">${esc(imp.area)}</span>`;
+}
+
+function openImpDetail(id){
+  const imp=_impData.find(i=>i.id===id);
+  if(!imp)return;
+  _impDetailOpenId=id;
+  const t=document.querySelector('#imp-detail-dialog .imp-edit-trigger');
+  if(t)t.style.display='';
+  fillImpDetailHeader(imp);
+  document.getElementById('idd-body').innerHTML=impDetailBodyHTML(imp);
+
+  document.getElementById('imp-detail-dialog').showModal();
+}
+
+function openImpEditForm(){
+  if(!_impDetailOpenId)return;
+  const imp=_impData.find(i=>i.id===_impDetailOpenId);
+  if(!imp)return;
+  const t=document.querySelector('#imp-detail-dialog .imp-edit-trigger');
+  if(t)t.style.display='none';
+  document.getElementById('idd-body').innerHTML=impEditFormHTML(imp);
+}
+
+function cancelImpEdit(){
+  if(!_impDetailOpenId)return;
+  openImpDetail(_impDetailOpenId);
+}
+
+function submitImpEditForm(e){
+  e.preventDefault();
+  if(!_impDetailOpenId)return;
+  const fd=new FormData(e.target);
+  const mLabel=(fd.get('metric_label')||'').toString().trim();
+  const patch={
+    title:(fd.get('title')||'').toString().trim(),
+    area:(fd.get('area')||'').toString().trim(),
+    status:fd.get('status'),
+    priority:fd.get('priority'),
+    description:(fd.get('description')||'').toString().trim(),
+    action_plan:(fd.get('action_plan')||'').toString().trim(),
+    expected_result:(fd.get('expected_result')||'').toString().trim(),
+    metric_label:mLabel||null,
+    metric_unit:(fd.get('metric_unit')||'').toString().trim(),
+    metric_before:parseImpNum(fd.get('metric_before')),
+    metric_after:parseImpNum(fd.get('metric_after'))
+  };
+  patchImp(_impDetailOpenId,patch);
+  const imp=_impData.find(i=>i.id===_impDetailOpenId);
+  if(imp){
+    const t=document.querySelector('#imp-detail-dialog .imp-edit-trigger');
+    if(t)t.style.display='';
+    fillImpDetailHeader(imp);
+    document.getElementById('idd-body').innerHTML=impDetailBodyHTML(imp);
+  }
+}
+
+function closeImpDetail(){
+  document.getElementById('imp-detail-dialog').close();
+  const t=document.querySelector('#imp-detail-dialog .imp-edit-trigger');
+  if(t)t.style.display='';
+  _impDetailOpenId=null;
+}
+
+(function initImpDetailBackdrop(){
+  const dlg=document.getElementById('imp-detail-dialog');
+  if(dlg)dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
+})();
+
+fetch('data/improvements.json?v='+Date.now())
+  .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+  .then(d=>{_impRemote=d.improvements||[];mergeAndRender();})
+  .catch(()=>{_impRemote=[];mergeAndRender();});
+
+// ── OPERAÇÕES ──────────────────────────────────────────────────────────────
 fetch('data/latest.json?v='+Date.now())
   .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
   .then(d=>{renderOps(d);renderOKRs(d);renderCOO(d)})
