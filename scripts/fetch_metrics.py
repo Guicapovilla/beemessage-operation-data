@@ -26,7 +26,7 @@ PLANE_BASE = "https://api.plane.so/api/v1"
 
 
 def _headers_plane():
-    return {"X-API-Key": os.environ["PLANE_API_TOKEN"], "Content-Type": "application/json"}
+    return {"X-API-Key": os.environ["PLANE_API_TOKEN"], "Content-Type": "application/json", "Connection": "close"}
 
 
 def _plane_slug():
@@ -66,7 +66,7 @@ def plane_get(path, params=None):
     url = f"{PLANE_BASE}/workspaces/{_plane_slug()}/{path}"
     for attempt in range(5):
         try:
-            r = requests.get(url, headers=_headers_plane(), params=params or {}, timeout=30)
+            r = requests.get(url, headers=_headers_plane(), params=params or {}, timeout=(10, 30))
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
             if attempt < 4:
                 wait = min(10 * (2 ** attempt), 120)
@@ -372,7 +372,7 @@ Gere um JSON com esta estrutura exata (sem markdown, só JSON puro):
                 headers=_anthropic_headers(),
                 json={"model": _m, "max_tokens": _mt,
                       "messages": [{"role": "user", "content": prompt}]},
-                timeout=60
+                timeout=(10, 60)
             )
             resp.raise_for_status()
             break
@@ -631,7 +631,7 @@ def _github_resolve_sprint_titles(
             "https://api.github.com/graphql",
             headers=gh_headers,
             json={"query": query},
-            timeout=30,
+            timeout=(10, 30),
         )
         resp.raise_for_status()
         gql = resp.json()
@@ -899,7 +899,7 @@ def build_product_progress():
                   }}
                 }}"""
                 resp = requests.post("https://api.github.com/graphql",
-                                     headers=gh_headers, json={"query": query}, timeout=30)
+                                     headers=gh_headers, json={"query": query}, timeout=(10, 30))
                 resp.raise_for_status()
                 gql = resp.json()
                 if gql.get("errors"):
@@ -1002,7 +1002,7 @@ def build_product_progress():
                     params["labels"] = label
                 r = requests.get(
                     f"https://api.github.com/repos/{owner}/{repo}/issues",
-                    headers=gh_headers, timeout=30,
+                    headers=gh_headers, timeout=(10, 30),
                     params=params,
                 )
                 r.raise_for_status()
@@ -1038,7 +1038,7 @@ def build_product_progress():
                     params["labels"] = label
                 r = requests.get(
                     f"https://api.github.com/repos/{owner}/{repo}/issues",
-                    headers=gh_headers, timeout=30,
+                    headers=gh_headers, timeout=(10, 30),
                     params=params,
                 )
                 r.raise_for_status()
