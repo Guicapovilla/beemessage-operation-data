@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-07T17:40:00+00:00",
+  "generated_at": "2026-04-13T19:57:48.838391+00:00",
   "week_label": "Semana 15 · Abril 2026",
   "current": {
     "total": 44,
@@ -12,30 +12,584 @@
     "completed_week": 31,
     "balance_week": -17,
     "areas": [
-      {"name": "Produto / Programação", "score": "A", "total": 8,  "done": 8,  "rate": 100, "overdue": 0, "cycle_time": null, "backlog": 0},
-      {"name": "Marketing",             "score": "A", "total": 6,  "done": 6,  "rate": 100, "overdue": 0, "cycle_time": null, "backlog": 0},
-      {"name": "Comunicação",           "score": "B", "total": 6,  "done": 5,  "rate": 83,  "overdue": 0, "cycle_time": 2.8,  "backlog": 1},
-      {"name": "Financeiro",            "score": "B", "total": 8,  "done": 7,  "rate": 88,  "overdue": 1, "cycle_time": null, "backlog": 2},
-      {"name": "CS",                    "score": "C", "total": 4,  "done": 3,  "rate": 75,  "overdue": 1, "cycle_time": null, "backlog": 2},
-      {"name": "Comercial",             "score": "C", "total": 11, "done": 9,  "rate": 82,  "overdue": 2, "cycle_time": 7.9,  "backlog": 1},
-      {"name": "Gestão",                "score": "D", "total": 6,  "done": 4,  "rate": 67,  "overdue": 2, "cycle_time": 16.9, "backlog": 0}
+      {
+        "name": "Produto / Programação",
+        "score": "A",
+        "total": 8,
+        "done": 8,
+        "rate": 100,
+        "overdue": 0,
+        "rollover": 0,
+        "backlog": 0,
+        "priority_breakdown": {
+          "urgente": {
+            "count": 1,
+            "avg_days": 2.1,
+            "min_days": 2.1,
+            "max_days": 2.1,
+            "tasks": [
+              "Corrigir bug crítico no módulo de envio"
+            ]
+          },
+          "alta": {
+            "count": 3,
+            "avg_days": 3.2,
+            "min_days": 1.5,
+            "max_days": 5.0,
+            "tasks": [
+              "Integrar SDK WhatsApp",
+              "Refatorar módulo de templates",
+              "Implementar retry automático"
+            ]
+          },
+          "media": {
+            "count": 3,
+            "avg_days": 4.8,
+            "min_days": 2.0,
+            "max_days": 8.5,
+            "tasks": [
+              "Documentar API endpoints",
+              "Atualizar dependências",
+              "Adicionar logs de auditoria"
+            ]
+          },
+          "baixa": {
+            "count": 1,
+            "avg_days": 1.5,
+            "min_days": 1.5,
+            "max_days": 1.5,
+            "tasks": [
+              "Ajustar padding no dashboard"
+            ]
+          },
+          "sem": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          }
+        }
+      },
+      {
+        "name": "Marketing",
+        "score": "A",
+        "total": 6,
+        "done": 6,
+        "rate": 100,
+        "overdue": 0,
+        "rollover": 0,
+        "backlog": 0,
+        "priority_breakdown": {
+          "urgente": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          },
+          "alta": {
+            "count": 2,
+            "avg_days": 2.5,
+            "min_days": 1.8,
+            "max_days": 3.2,
+            "tasks": [
+              "Campanha de lançamento Q2",
+              "Atualizar materiais de vendas"
+            ]
+          },
+          "media": {
+            "count": 3,
+            "avg_days": 3.1,
+            "min_days": 1.0,
+            "max_days": 5.5,
+            "tasks": [
+              "Post LinkedIn semanal",
+              "Newsletter mensal",
+              "Atualizar bio das redes"
+            ]
+          },
+          "baixa": {
+            "count": 1,
+            "avg_days": 1.0,
+            "min_days": 1.0,
+            "max_days": 1.0,
+            "tasks": [
+              "Arquivar creative antigos"
+            ]
+          },
+          "sem": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          }
+        }
+      },
+      {
+        "name": "Comunicação",
+        "score": "B",
+        "total": 6,
+        "done": 5,
+        "rate": 83,
+        "overdue": 0,
+        "rollover": 0,
+        "backlog": 1,
+        "priority_breakdown": {
+          "urgente": {
+            "count": 1,
+            "avg_days": 1.8,
+            "min_days": 1.8,
+            "max_days": 1.8,
+            "tasks": [
+              "Responder reclamação cliente VIP"
+            ]
+          },
+          "alta": {
+            "count": 1,
+            "avg_days": 2.8,
+            "min_days": 2.8,
+            "max_days": 2.8,
+            "tasks": [
+              "Script atendimento padrão"
+            ]
+          },
+          "media": {
+            "count": 2,
+            "avg_days": 3.5,
+            "min_days": 2.1,
+            "max_days": 4.9,
+            "tasks": [
+              "Mapear FAQs novos clientes",
+              "Revisar templates de e-mail"
+            ]
+          },
+          "baixa": {
+            "count": 1,
+            "avg_days": 1.2,
+            "min_days": 1.2,
+            "max_days": 1.2,
+            "tasks": [
+              "Atualizar assinatura de e-mail"
+            ]
+          },
+          "sem": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          }
+        }
+      },
+      {
+        "name": "Financeiro",
+        "score": "B",
+        "total": 8,
+        "done": 7,
+        "rate": 88,
+        "overdue": 1,
+        "rollover": 0,
+        "backlog": 2,
+        "priority_breakdown": {
+          "urgente": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          },
+          "alta": {
+            "count": 2,
+            "avg_days": 4.1,
+            "min_days": 2.5,
+            "max_days": 5.7,
+            "tasks": [
+              "Conciliação bancária abril",
+              "Emitir notas fiscais pendentes"
+            ]
+          },
+          "media": {
+            "count": 4,
+            "avg_days": 5.2,
+            "min_days": 3.0,
+            "max_days": 8.0,
+            "tasks": [
+              "Relatório DRE mensal",
+              "Atualizar planilha de custos",
+              "Revisão contratos fornecedores"
+            ]
+          },
+          "baixa": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          },
+          "sem": {
+            "count": 1,
+            "avg_days": 2.0,
+            "min_days": 2.0,
+            "max_days": 2.0,
+            "tasks": [
+              "Organizar arquivos digitalizados"
+            ]
+          }
+        }
+      },
+      {
+        "name": "CS",
+        "score": "C",
+        "total": 4,
+        "done": 3,
+        "rate": 75,
+        "overdue": 1,
+        "rollover": 0,
+        "backlog": 2,
+        "priority_breakdown": {
+          "urgente": {
+            "count": 1,
+            "avg_days": 3.5,
+            "min_days": 3.5,
+            "max_days": 3.5,
+            "tasks": [
+              "Churn em risco — cliente Acme"
+            ]
+          },
+          "alta": {
+            "count": 1,
+            "avg_days": 4.2,
+            "min_days": 4.2,
+            "max_days": 4.2,
+            "tasks": [
+              "Onboarding cliente Beta Corp"
+            ]
+          },
+          "media": {
+            "count": 1,
+            "avg_days": 2.8,
+            "min_days": 2.8,
+            "max_days": 2.8,
+            "tasks": [
+              "Atualizar NPS do trimestre"
+            ]
+          },
+          "baixa": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          },
+          "sem": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          }
+        }
+      },
+      {
+        "name": "Comercial",
+        "score": "C",
+        "total": 11,
+        "done": 9,
+        "rate": 82,
+        "overdue": 2,
+        "rollover": 1,
+        "backlog": 1,
+        "priority_breakdown": {
+          "urgente": {
+            "count": 2,
+            "avg_days": 2.8,
+            "min_days": 1.5,
+            "max_days": 4.1,
+            "tasks": [
+              "Proposta urgente Empresa XYZ",
+              "Renovação contrato iminente"
+            ]
+          },
+          "alta": {
+            "count": 3,
+            "avg_days": 5.3,
+            "min_days": 3.2,
+            "max_days": 8.1,
+            "tasks": [
+              "Pipeline Q2 atualizado",
+              "Demo para lead qualificado",
+              "Follow-up pós-proposta"
+            ]
+          },
+          "media": {
+            "count": 3,
+            "avg_days": 9.4,
+            "min_days": 6.0,
+            "max_days": 13.5,
+            "tasks": [
+              "Prospecção segmento saúde",
+              "Atualizar CRM",
+              "Qualificar leads inbound"
+            ]
+          },
+          "baixa": {
+            "count": 1,
+            "avg_days": 1.5,
+            "min_days": 1.5,
+            "max_days": 1.5,
+            "tasks": [
+              "Organizar materiais de apresentação"
+            ]
+          },
+          "sem": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          }
+        }
+      },
+      {
+        "name": "Gestão",
+        "score": "D",
+        "total": 6,
+        "done": 4,
+        "rate": 67,
+        "overdue": 2,
+        "rollover": 1,
+        "backlog": 0,
+        "priority_breakdown": {
+          "urgente": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          },
+          "alta": {
+            "count": 2,
+            "avg_days": 8.5,
+            "min_days": 5.2,
+            "max_days": 11.8,
+            "tasks": [
+              "Reunião de alinhamento estratégico",
+              "Revisão metas Q2"
+            ]
+          },
+          "media": {
+            "count": 2,
+            "avg_days": 14.2,
+            "min_days": 10.5,
+            "max_days": 17.9,
+            "tasks": [
+              "Definir OKRs do trimestre",
+              "Atualizar handbook da equipe"
+            ]
+          },
+          "baixa": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          },
+          "sem": {
+            "count": 0,
+            "avg_days": null,
+            "min_days": null,
+            "max_days": null,
+            "tasks": []
+          }
+        }
+      }
     ],
     "collaborators": [
-      {"name": "guilhermetcapovilla", "tasks": 8,  "done": 4, "rate": 50, "overloaded": false, "chronic": true,  "severity": "critical", "areas": ["Gestão"],   "overdue": [{"title": "Follow-up leads que receberam proposta", "days": 21, "area": "Gestão"}, {"title": "Verificar processo Meta Partner", "days": 4, "area": "Gestão"}]},
-      {"name": "daniel.violacosta",   "tasks": 6,  "done": 4, "rate": 67, "overloaded": false, "chronic": true,  "severity": "critical", "areas": ["Comercial"], "overdue": [{"title": "Classificar backlog por área e projeto", "days": 21, "area": "Comercial"}]},
-      {"name": "dantasbarretosaulo",  "tasks": 5,  "done": 3, "rate": 60, "overloaded": false, "chronic": false, "severity": "warn",     "areas": ["CS"],       "overdue": [{"title": "Sequência follow-up único para novos clientes", "days": 12, "area": "CS"}]},
-      {"name": "pedro",               "tasks": 7,  "done": 5, "rate": 71, "overloaded": false, "chronic": false, "severity": "warn",     "areas": ["Comercial"], "overdue": [{"title": "Sequência de acompanhamento para leads", "days": 11, "area": "Comercial"}]},
-      {"name": "vini.lovizaro",       "tasks": 9,  "done": 8, "rate": 89, "overloaded": false, "chronic": false, "severity": "warn",     "areas": ["Financeiro"],"overdue": [{"title": "Integrar planilhas locais com a nuvem", "days": 11, "area": "Financeiro"}]},
-      {"name": "mariana.silva",       "tasks": 9,  "done": 9, "rate": 100,"overloaded": false, "chronic": false, "severity": "ok",       "areas": ["Marketing"], "overdue": []},
-      {"name": "carlos.mendes",       "tasks": 12, "done": 11,"rate": 92, "overloaded": true,  "chronic": false, "severity": "warn",     "areas": ["Produto / Programação","CS"], "overdue": []}
+      {
+        "name": "guilhermetcapovilla",
+        "tasks": 8,
+        "done": 4,
+        "rate": 50,
+        "overloaded": false,
+        "chronic": true,
+        "severity": "critical",
+        "areas": [
+          "Gestão"
+        ],
+        "overdue": [
+          {
+            "title": "Follow-up leads que receberam proposta",
+            "days": 21,
+            "area": "Gestão"
+          },
+          {
+            "title": "Verificar processo Meta Partner",
+            "days": 4,
+            "area": "Gestão"
+          }
+        ]
+      },
+      {
+        "name": "daniel.violacosta",
+        "tasks": 6,
+        "done": 4,
+        "rate": 67,
+        "overloaded": false,
+        "chronic": true,
+        "severity": "critical",
+        "areas": [
+          "Comercial"
+        ],
+        "overdue": [
+          {
+            "title": "Classificar backlog por área e projeto",
+            "days": 21,
+            "area": "Comercial"
+          }
+        ]
+      },
+      {
+        "name": "dantasbarretosaulo",
+        "tasks": 5,
+        "done": 3,
+        "rate": 60,
+        "overloaded": false,
+        "chronic": false,
+        "severity": "warn",
+        "areas": [
+          "CS"
+        ],
+        "overdue": [
+          {
+            "title": "Sequência follow-up único para novos clientes",
+            "days": 12,
+            "area": "CS"
+          }
+        ]
+      },
+      {
+        "name": "pedro",
+        "tasks": 7,
+        "done": 5,
+        "rate": 71,
+        "overloaded": false,
+        "chronic": false,
+        "severity": "warn",
+        "areas": [
+          "Comercial"
+        ],
+        "overdue": [
+          {
+            "title": "Sequência de acompanhamento para leads",
+            "days": 11,
+            "area": "Comercial"
+          }
+        ]
+      },
+      {
+        "name": "vini.lovizaro",
+        "tasks": 9,
+        "done": 8,
+        "rate": 89,
+        "overloaded": false,
+        "chronic": false,
+        "severity": "warn",
+        "areas": [
+          "Financeiro"
+        ],
+        "overdue": [
+          {
+            "title": "Integrar planilhas locais com a nuvem",
+            "days": 11,
+            "area": "Financeiro"
+          }
+        ]
+      },
+      {
+        "name": "mariana.silva",
+        "tasks": 9,
+        "done": 9,
+        "rate": 100,
+        "overloaded": false,
+        "chronic": false,
+        "severity": "ok",
+        "areas": [
+          "Marketing"
+        ],
+        "overdue": []
+      },
+      {
+        "name": "carlos.mendes",
+        "tasks": 12,
+        "done": 11,
+        "rate": 92,
+        "overloaded": true,
+        "chronic": false,
+        "severity": "warn",
+        "areas": [
+          "Produto / Programação",
+          "CS"
+        ],
+        "overdue": []
+      }
     ],
     "overdue_tasks": [
-      {"title": "Follow-up leads que receberam proposta",      "area": "Comercial", "days": 21, "assignees": ["daniel.violacosta"],  "due": "17/03"},
-      {"title": "Classificar backlog por área e projeto",      "area": "Gestão",    "days": 21, "assignees": ["guilhermetcapovilla"],"due": "17/03"},
-      {"title": "Sequência follow-up único para novos",        "area": "CS",        "days": 12, "assignees": ["dantasbarretosaulo"], "due": "26/03"},
-      {"title": "Sequência de acompanhamento para leads",      "area": "Comercial", "days": 11, "assignees": ["pedro"],             "due": "27/03"},
-      {"title": "Integrar planilhas locais com a nuvem",       "area": "Financeiro","days": 11, "assignees": ["vini.lovizaro"],     "due": "27/03"},
-      {"title": "Verificar processo para se tornar Meta Partner","area": "Gestão",  "days": 4,  "assignees": ["guilhermetcapovilla"],"due": "03/04"}
+      {
+        "title": "Follow-up leads que receberam proposta",
+        "area": "Comercial",
+        "days": 21,
+        "assignees": [
+          "daniel.violacosta"
+        ],
+        "due": "17/03"
+      },
+      {
+        "title": "Classificar backlog por área e projeto",
+        "area": "Gestão",
+        "days": 21,
+        "assignees": [
+          "guilhermetcapovilla"
+        ],
+        "due": "17/03"
+      },
+      {
+        "title": "Sequência follow-up único para novos",
+        "area": "CS",
+        "days": 12,
+        "assignees": [
+          "dantasbarretosaulo"
+        ],
+        "due": "26/03"
+      },
+      {
+        "title": "Sequência de acompanhamento para leads",
+        "area": "Comercial",
+        "days": 11,
+        "assignees": [
+          "pedro"
+        ],
+        "due": "27/03"
+      },
+      {
+        "title": "Integrar planilhas locais com a nuvem",
+        "area": "Financeiro",
+        "days": 11,
+        "assignees": [
+          "vini.lovizaro"
+        ],
+        "due": "27/03"
+      },
+      {
+        "title": "Verificar processo para se tornar Meta Partner",
+        "area": "Gestão",
+        "days": 4,
+        "assignees": [
+          "guilhermetcapovilla"
+        ],
+        "due": "03/04"
+      }
     ]
   },
   "previous": {
@@ -46,13 +600,76 @@
     "overdue": 8,
     "chronic_rollover": 3,
     "areas": [
-      {"name": "Produto / Programação", "score": "B", "total": 7,  "done": 6,  "rate": 88,  "overdue": 1, "cycle_time": 4.1,  "backlog": 2},
-      {"name": "Marketing",             "score": "B", "total": 5,  "done": 4,  "rate": 80,  "overdue": 1, "cycle_time": null, "backlog": 1},
-      {"name": "Comunicação",           "score": "B", "total": 5,  "done": 4,  "rate": 80,  "overdue": 1, "cycle_time": 3.5,  "backlog": 2},
-      {"name": "Financeiro",            "score": "C", "total": 7,  "done": 5,  "rate": 71,  "overdue": 2, "cycle_time": null, "backlog": 3},
-      {"name": "CS",                    "score": "C", "total": 4,  "done": 3,  "rate": 75,  "overdue": 2, "cycle_time": null, "backlog": 2},
-      {"name": "Comercial",             "score": "C", "total": 9,  "done": 7,  "rate": 78,  "overdue": 3, "cycle_time": 9.2,  "backlog": 2},
-      {"name": "Gestão",                "score": "D", "total": 5,  "done": 3,  "rate": 60,  "overdue": 3, "cycle_time": 18.2, "backlog": 1}
+      {
+        "name": "Produto / Programação",
+        "score": "B",
+        "total": 7,
+        "done": 6,
+        "rate": 88,
+        "overdue": 1,
+        "rollover": 1,
+        "backlog": 2
+      },
+      {
+        "name": "Marketing",
+        "score": "B",
+        "total": 5,
+        "done": 4,
+        "rate": 80,
+        "overdue": 1,
+        "rollover": 0,
+        "backlog": 1
+      },
+      {
+        "name": "Comunicação",
+        "score": "B",
+        "total": 5,
+        "done": 4,
+        "rate": 80,
+        "overdue": 1,
+        "rollover": 0,
+        "backlog": 2
+      },
+      {
+        "name": "Financeiro",
+        "score": "C",
+        "total": 7,
+        "done": 5,
+        "rate": 71,
+        "overdue": 2,
+        "rollover": 0,
+        "backlog": 3
+      },
+      {
+        "name": "CS",
+        "score": "C",
+        "total": 4,
+        "done": 3,
+        "rate": 75,
+        "overdue": 2,
+        "rollover": 0,
+        "backlog": 2
+      },
+      {
+        "name": "Comercial",
+        "score": "C",
+        "total": 9,
+        "done": 7,
+        "rate": 78,
+        "overdue": 3,
+        "rollover": 1,
+        "backlog": 2
+      },
+      {
+        "name": "Gestão",
+        "score": "D",
+        "total": 5,
+        "done": 3,
+        "rate": 60,
+        "overdue": 3,
+        "rollover": 1,
+        "backlog": 1
+      }
     ]
   },
   "insights": {
@@ -79,10 +696,537 @@
       "Redistribuir ao menos 3 tasks de carlos.mendes para equilibrar a carga da equipe"
     ]
   },
+  "product_progress": {
+    "source": "github",
+    "sprint": {
+      "current": "S2 Abril",
+      "previous": "S1 Abril"
+    },
+    "planned": {
+      "count": 24,
+      "items": [
+        {
+          "title": "[FEAT] -  Implementar opt-in de comunicações promocionais",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "[FEAT] -  Adicionar ponto de conversão para compra de usuário adicional",
+          "assignees": [],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Monitoramento",
+          "assignees": [
+            "rafaelpoa"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Adicionar opção etiquetação em massa",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "quando o nome do projeto é muito grande, ele buga a tagzinha",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Adicionar estado de createdBy undefined na página de contato",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Formatar data no email de convite para org",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Clicar em trocar de conta na pagina de aceitar convite precisa deslogar o usuário no clerk",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Adicionar badge de role na organização",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Melhorar responsividade da lista de contatos quando tem badge de grupo",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Alterar visualização de data de envio da tabela de agendamentos",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Adicionar truncamento na tabela de agendamentos na página de unidade de contato",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Mensagem com status de enviado mas não chegou para comunidade",
+          "assignees": [
+            "rafaelpoa"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Alterar view de envio de mensagens da sequência",
+          "assignees": [
+            "rafaelpoa"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Ajustar responsividade do dialog para importar contatos do WhatsApp em telas pequenas",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Adicionar abandono de checkout em uma lista do Brevo",
+          "assignees": [
+            "GussViola"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "O botão de github não está funcionando e tirar a carinha do titulo",
+          "assignees": [
+            "GussViola"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "[FEAT] -  Desenvolver conexão API do Playbook Pré-vendas",
+          "assignees": [
+            "GussViola"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Arrumar visualização de tooltip na lista de sequencias",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Bloquear slide quando disponível somente 1 para o usuário",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Colocar id da organização e do projeto na página de configurações",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "[FEAT] -  Implementação API oficial",
+          "assignees": [
+            "rafaelpoa"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "adicionar scroll na listagem de projetos",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Arrumar visualização de seleção de projetos",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        }
+      ]
+    },
+    "in_progress": {
+      "count": 4,
+      "items": [
+        {
+          "title": "Envio individual enviou 3 vezes a mesma mensagem.",
+          "assignees": [
+            "rafaelpoa"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "[FEAT] -  Mensagens Recorrentes",
+          "assignees": [
+            "GussViola",
+            "BrosGabriel"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Montar integração API",
+          "assignees": [
+            "GussViola"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        },
+        {
+          "title": "Estudar e criar fumadocs",
+          "assignees": [
+            "rafaelpoa"
+          ],
+          "cycle_days": null,
+          "due": null,
+          "priority": "sem"
+        }
+      ]
+    },
+    "completed": {
+      "count": 1,
+      "items": [
+        {
+          "title": "Arrumar visualização da etiqueta",
+          "assignees": [
+            "BrosGabriel"
+          ],
+          "cycle_days": 14.0,
+          "due": null,
+          "priority": "sem"
+        }
+      ]
+    },
+    "completion_rate_pct": 4,
+    "rollover": 13,
+    "avg_cycle_time_sprint": 14.0,
+    "priority_breakdown": {
+      "urgente": {
+        "count": 0,
+        "avg_days": null,
+        "min_days": null,
+        "max_days": null,
+        "tasks": []
+      },
+      "alta": {
+        "count": 0,
+        "avg_days": null,
+        "min_days": null,
+        "max_days": null,
+        "tasks": []
+      },
+      "media": {
+        "count": 0,
+        "avg_days": null,
+        "min_days": null,
+        "max_days": null,
+        "tasks": []
+      },
+      "baixa": {
+        "count": 0,
+        "avg_days": null,
+        "min_days": null,
+        "max_days": null,
+        "tasks": []
+      },
+      "sem": {
+        "count": 1,
+        "avg_days": 14.0,
+        "min_days": 14.0,
+        "max_days": 14.0,
+        "tasks": [
+          "Arrumar visualização da etiqueta"
+        ]
+      }
+    },
+    "previous_sprint": {
+      "planned": {
+        "count": 0,
+        "items": []
+      },
+      "in_progress": {
+        "count": 0,
+        "items": []
+      },
+      "completed": {
+        "count": 15,
+        "items": [
+          {
+            "title": "Criar arte e adicionar popup de nova funcionalidade",
+            "assignees": [
+              "BrosGabriel"
+            ],
+            "cycle_days": 0.7,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Importação por CSV não está importando CPF",
+            "assignees": [
+              "rafaelpoa"
+            ],
+            "cycle_days": 1.2,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Deletar Stripe customer quando deletar uma organização",
+            "assignees": [
+              "rafaelpoa"
+            ],
+            "cycle_days": 47.0,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Hooks - useOrganizationMembers, useProjectMembers, usePermissions",
+            "assignees": [
+              "GussViola"
+            ],
+            "cycle_days": 14.9,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Proteção de Ações Críticas do Projeto no Backend",
+            "assignees": [
+              "GussViola"
+            ],
+            "cycle_days": 13.9,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Design em figma da funcionalidade de adição de usuários na organização",
+            "assignees": [
+              "BrosGabriel"
+            ],
+            "cycle_days": 15.9,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Adicionar botão de criar etiqueta no dropdown do contact sheet",
+            "assignees": [
+              "BrosGabriel"
+            ],
+            "cycle_days": 45.0,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Criar dialog da promoção mês do consumidor",
+            "assignees": [
+              "BrosGabriel"
+            ],
+            "cycle_days": 0.2,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Melhorar UI de titulo de sequencia no sequenceDialog",
+            "assignees": [
+              "BrosGabriel"
+            ],
+            "cycle_days": 13.2,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Duplicar sequenceContent não está duplicando messageContent",
+            "assignees": [
+              "GussViola"
+            ],
+            "cycle_days": 0.0,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Mensagens de sequencia estão sendo criadas com status DRAFT",
+            "assignees": [
+              "GussViola"
+            ],
+            "cycle_days": 0.0,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Verificar se novas conversas estão sendo importadas",
+            "assignees": [
+              "rafaelpoa"
+            ],
+            "cycle_days": 1.0,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Problema de chave primária ao aceitar invite de organização",
+            "assignees": [
+              "rafaelpoa",
+              "GussViola"
+            ],
+            "cycle_days": 0.6,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Criar edição da mensagem no conteúdo da sequência",
+            "assignees": [
+              "BrosGabriel"
+            ],
+            "cycle_days": null,
+            "due": null,
+            "priority": "sem"
+          },
+          {
+            "title": "Criar filtro de data de aniversário na página de lista de contatos",
+            "assignees": [
+              "BrosGabriel"
+            ],
+            "cycle_days": 0.3,
+            "due": null,
+            "priority": "sem"
+          }
+        ]
+      },
+      "completion_rate_pct": null,
+      "rollover": 0,
+      "avg_cycle_time_sprint": 11.0,
+      "priority_breakdown": {
+        "urgente": {
+          "count": 0,
+          "avg_days": null,
+          "min_days": null,
+          "max_days": null,
+          "tasks": []
+        },
+        "alta": {
+          "count": 0,
+          "avg_days": null,
+          "min_days": null,
+          "max_days": null,
+          "tasks": []
+        },
+        "media": {
+          "count": 0,
+          "avg_days": null,
+          "min_days": null,
+          "max_days": null,
+          "tasks": []
+        },
+        "baixa": {
+          "count": 0,
+          "avg_days": null,
+          "min_days": null,
+          "max_days": null,
+          "tasks": []
+        },
+        "sem": {
+          "count": 15,
+          "avg_days": 11.0,
+          "min_days": 0.0,
+          "max_days": 47.0,
+          "tasks": [
+            "Criar arte e adicionar popup de nova funcionalidade",
+            "Importação por CSV não está importando CPF",
+            "Deletar Stripe customer quando deletar uma organização"
+          ]
+        }
+      }
+    }
+  },
   "trend": [
-    {"week": "Sem. 12", "rate": 71, "overdue": 11, "cycle_time": 13.1, "total": 45, "done": 32, "remaining": 13, "created_week": 52, "completed_week": 28, "balance_week": 24},
-    {"week": "Sem. 13", "rate": 74, "overdue": 9,  "cycle_time": 12.2, "total": 43, "done": 32, "remaining": 11, "created_week": 41, "completed_week": 36, "balance_week": 5},
-    {"week": "Sem. 14", "rate": 76, "overdue": 8,  "cycle_time": 11.4, "total": 42, "done": 32, "remaining": 10, "created_week": 38, "completed_week": 33, "balance_week": 5},
-    {"week": "Sem. 15", "rate": 84, "overdue": 6,  "cycle_time": 9.2,  "total": 44, "done": 37, "remaining": 7, "created_week": 14, "completed_week": 31, "balance_week": -17}
+    {
+      "week": "Sem. 12"
+    },
+    {
+      "week": "Sem. 13"
+    },
+    {
+      "week": "Sem. 14"
+    },
+    {
+      "week": "Semana 15 · Abril 2026"
+    }
   ]
 }

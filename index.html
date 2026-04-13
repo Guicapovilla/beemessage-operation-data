@@ -116,16 +116,40 @@
   .tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:10px}
   .tag-c{background:var(--red-bg);color:var(--red)}
   .tag-w{background:var(--amber-bg);color:var(--amber)}
+  /* ── Product Progress ── */
+  .pp-sec{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);font-weight:600;margin:28px 0 4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pp-sec-lead{text-transform:none;letter-spacing:.02em;color:var(--text);font-size:12px;font-weight:600}
+  .pp-sub{font-size:11px;color:var(--hint);margin-bottom:14px;font-weight:400;text-transform:none;letter-spacing:0}
+  .pp-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:28px}
+  .pp-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:20px 20px 14px;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:0}
+  .pp-card-accent{position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+  .pp-card-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;margin-top:4px}
+  .pp-card-num{font-size:34px;font-weight:700;letter-spacing:-.8px;line-height:1}
+  .pp-card-desc{font-size:11px;color:var(--muted);margin-top:6px;margin-bottom:12px}
+  .pp-card-toggle{font-size:11px;font-weight:600;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;text-align:left;display:flex;align-items:center;gap:5px;transition:color .15s}
+  .pp-card-toggle:hover{color:var(--text)}
+  .pp-card-toggle-chev{display:inline-block;transition:transform .15s;font-size:10px}
+  .pp-card-toggle[aria-expanded="true"] .pp-card-toggle-chev{transform:rotate(90deg)}
+  .pp-card-list{margin-top:10px;border-top:.5px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+  .pp-item{display:flex;flex-direction:column;gap:2px;padding:6px 8px;background:var(--surface2);border-radius:6px;border:.5px solid var(--border)}
+  .pp-item-title{font-size:12px;color:var(--text);line-height:1.4;word-break:break-word}
+  .pp-item-meta{font-size:10px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+  .pp-empty{font-size:12px;color:var(--hint);padding:8px 0;text-align:center}
+  .pp-sub{margin:-4px 0 12px;font-size:11px;color:var(--muted);line-height:1.45}
+  .pp-compare{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;padding:10px 14px;background:var(--surface2);border:.5px solid var(--border);border-radius:var(--radius);margin-bottom:12px;font-size:11px}
+  .pp-compare-lbl{color:var(--hint);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
+  .pp-compare-val{font-weight:700;color:var(--text);margin-left:4px}
+  .pp-error{background:rgba(245,101,101,.06);border:.5px solid rgba(245,101,101,.2);border-radius:var(--radius);padding:14px 16px;font-size:12px;color:var(--muted);margin-bottom:28px}
+  @media(max-width:900px){.pp-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:500px){.pp-grid{grid-template-columns:1fr}}
+  .pri-hdr{white-space:nowrap;text-align:center!important;padding:8px 10px!important}
+  .pri-hdr-sub{font-size:9px;color:var(--hint);font-weight:400;letter-spacing:0;text-transform:none;margin-top:3px}
+  .pri-sep{border-left:.5px solid var(--border2)!important}
+  .pri-cell{cursor:default;white-space:nowrap;font-size:11px;font-weight:500;text-align:center;padding:8px 10px!important}
+  .pri-cell:hover{background:var(--surface2)}
+  .pri-tooltip{background:var(--surface2);border:.5px solid var(--border2);border-radius:var(--radius);padding:12px 14px;box-shadow:0 8px 28px rgba(0,0,0,.55);min-width:190px;max-width:270px;line-height:1.5;font-size:12px}
   .chart-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:12px}
-  .ch-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-  .ch-title-stack{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
-  .ch-title{font-size:12px;font-weight:500;color:var(--muted)}
-  .ch-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-  .ch-sub{font-size:11px;color:var(--hint);line-height:1.45;max-width:520px}
-  .ch-leg{display:flex;gap:14px;flex-wrap:wrap}
-  .cl-i{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)}
-  .cl-d{width:8px;height:8px;border-radius:2px}
-  .flow-week{margin-top:14px;padding:12px 14px;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px}
+  .flow-week{margin-top:0;padding:12px 14px;background:var(--surface2);border-radius:var(--radius);border:.5px solid var(--border);display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px}
   .flow-week-hdr{display:flex;align-items:center;gap:8px;margin-right:8px}
   .flow-week-title{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .flow-week-item{display:flex;flex-direction:column;gap:3px;min-width:72px}
@@ -134,6 +158,8 @@
   .flow-week-val-bal-pos{color:var(--amber)}
   .flow-week-val-bal-neg{color:var(--green)}
   .flow-week-sub{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4;max-width:520px}
+  .ch-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .ch-title{font-size:12px;font-weight:500;color:var(--muted)}
   .iw{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);padding:22px 24px;margin-bottom:12px}
   .i-hl{font-size:16px;font-weight:600;margin-bottom:12px;line-height:1.4}
   .i-sm{font-size:13px;color:#bbc0d0;line-height:1.7;margin-bottom:18px}
@@ -333,29 +359,33 @@
   <div id="tab-ops" class="tab-panel active">
     <div class="kpis" id="kpi-block"></div>
 
-    <div class="sec">Burn semanal — últimas semanas</div>
-    <div class="chart-card">
-      <div class="ch-hdr">
-        <div class="ch-title-stack">
-          <div class="ch-title-row">
-            <span class="ch-title">Burn semanal (tarefas criadas na semana)</span>
-            <button type="button" class="help-q help-q-sm" onclick="openMetricHelp('chart_burn_weekly')" aria-label="Como ler este gráfico?">?</button>
-          </div>
-          <span class="ch-sub">Cada ponto é o recorte do Plane na semana: concluídas (burn-up) vs ainda abertas (restante / burn-down).</span>
-        </div>
-        <div class="ch-leg">
-          <div class="cl-i"><div class="cl-d" style="background:#3ecf8e"></div>Concluídas (burn-up)</div>
-          <div class="cl-i"><div class="cl-d" style="background:#f5a623"></div>Abertas / restante</div>
-        </div>
-      </div>
-      <div style="position:relative;height:180px"><canvas id="trendChart" role="img" aria-label="Burn semanal: concluídas versus restantes por semana">Gráfico burn semanal.</canvas></div>
-      <div class="flow-week" id="flow-week-block" aria-live="polite"></div>
-    </div>
+    <!-- ── Progresso do projeto / sprint (GitHub Project) ── -->
+    <div id="product-progress-block"></div>
 
     <div class="sec">Saúde por área</div>
-    <div class="tbl-wrap">
-      <table>
-        <thead><tr><td>Área</td><td><span class="th-help">Score<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_score')" aria-label="O que é Score?">?</button></span></td><td><span class="th-help">Taxa<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_taxa')" aria-label="O que é Taxa?">?</button></span></td><td><span class="th-help">Atrasos<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_atrasos')" aria-label="O que é Atrasos?">?</button></span></td><td><span class="th-help">C.Time<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_cycle_time')" aria-label="O que é C.Time?">?</button></span></td><td><span class="th-help">Backlog<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_backlog')" aria-label="O que é Backlog?">?</button></span></td></tr></thead>
+    <div class="chart-card" style="margin-bottom:12px;padding:16px 18px">
+      <div class="flow-week" id="flow-week-block" aria-live="polite"></div>
+    </div>
+    <div class="tbl-wrap" style="overflow-x:auto">
+      <table style="min-width:860px">
+        <thead>
+          <tr>
+            <td rowspan="2">Área</td>
+            <td rowspan="2"><span class="th-help">Score<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_score')" aria-label="O que é Score?">?</button></span></td>
+            <td rowspan="2"><span class="th-help">Taxa<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_taxa')" aria-label="O que é Taxa?">?</button></span></td>
+            <td rowspan="2"><span class="th-help">Atrasos<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_atrasos')" aria-label="O que é Atrasos?">?</button></span></td>
+            <td rowspan="2"><span class="th-help">Rollover<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_rollover')" aria-label="O que é Rollover?">?</button></span></td>
+            <td rowspan="2"><span class="th-help">Backlog<button type="button" class="help-q help-q-sm" onclick="openMetricHelp('col_backlog')" aria-label="O que é Backlog?">?</button></span></td>
+            <td colspan="5" class="pri-sep" style="text-align:center;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--hint);padding-bottom:4px">Concluídas por prioridade — qtd / avg</td>
+          </tr>
+          <tr>
+            <td class="pri-hdr pri-sep" style="color:#EF4444">🔴 Urgente<div class="pri-hdr-sub">concl. / avg</div></td>
+            <td class="pri-hdr" style="color:#F97316">🟠 Alta<div class="pri-hdr-sub">concl. / avg</div></td>
+            <td class="pri-hdr" style="color:#EAB308">🟡 Média<div class="pri-hdr-sub">concl. / avg</div></td>
+            <td class="pri-hdr" style="color:#3B82F6">🔵 Baixa<div class="pri-hdr-sub">concl. / avg</div></td>
+            <td class="pri-hdr" style="color:#9CA3AF">⚪ Sem<div class="pri-hdr-sub">concl. / avg</div></td>
+          </tr>
+        </thead>
         <tbody id="areas-body"></tbody>
       </table>
     </div>
@@ -609,21 +639,17 @@ const METRIC_HELP={
     title:'Atrasos (por área)',
     body:'<p>Quantidade de tarefas da área que estão com entrega atrasada (due passado e ainda abertas).</p><p>Não é o mesmo que “+7 dias” do KPI geral — aqui é o total de atrasadas por área para comparar onde o problema concentra.</p>'
   },
-  col_cycle_time:{
-    title:'C.Time (cycle time por área)',
-    body:'<p>Tempo médio em dias (criação → conclusão) só das tarefas já fechadas naquela área na janela da semana.</p><p><strong>Em uma frase:</strong> ajuda a ver se uma área entrega rápido ou se as coisas “cozinham” muito tempo.</p>'
+  col_rollover:{
+    title:'Rollover (por área)',
+    body:'<p>Quantidade de tarefas <strong>ainda abertas</strong> na área que foram <strong>criadas antes da semana anterior</strong> — o mesmo critério do KPI “Rollover crônico”, só que repartido por departamento.</p><p><strong>Em uma frase:</strong> mostra onde o “carrego de semana em semana” se concentra; zero é o ideal.</p>'
   },
   col_backlog:{
     title:'Backlog',
     body:'<p>Número de tarefas ainda abertas na área (não concluídas), independente de terem sido criadas nesta semana ou antes.</p><p><strong>Em uma frase:</strong> quanto o time ainda tem na fila para aquela área.</p>'
   },
-  chart_burn_weekly:{
-    title:'Burn semanal no dashboard',
-    body:'<p>Cada semana no eixo horizontal é uma “foto” tirada quando o script rodou. Só entram <strong>tarefas criadas naquela semana</strong> no Plane (coorte da semana — não é o backlog inteiro).</p><p>A linha <strong>verde (burn-up)</strong> mostra quantas dessas tarefas do coorte já foram <strong>marcadas como concluídas</strong>. A linha <strong>âmbar tracejada</strong> mostra quantas <strong>ainda estão abertas</strong> naquele recorte.</p><p><strong>Abaixo do gráfico</strong> o bloco <strong>Fluxo da semana</strong> responde a outra pergunta: quantas tarefas <strong>entraram</strong> na semana (criadas) versus quantas <strong>fecharam</strong> na semana (por data de conclusão, de qualquer época). O <strong>saldo</strong> é criadas − concluídas.</p>'
-  },
   flow_weekly:{
     title:'Fluxo da semana (criadas vs concluídas)',
-    body:'<p><strong>Criadas na semana:</strong> issues com <code>created_at</code> na semana corrente (mesma janela do recorte “esta semana” do script).</p><p><strong>Concluídas na semana:</strong> issues com <code>completed_at</code> na semana — <em>inclui tarefas criadas antes</em>, ou seja, tudo o que o time fechou nesta semana.</p><p><strong>Saldo</strong> = criadas − concluídas. <strong>Negativo</strong> (ex.: −17) significa que fecharam mais do que abriram novas na semana — em geral bom sinal para a fila. <strong>Positivo</strong> significa que entrou mais trabalho novo do que saiu concluído na semana.</p><p>Isto é independente das linhas do gráfico acima, que olham só o coorte “criadas naquela semana”.</p>'
+    body:'<p><strong>Criadas na semana:</strong> issues com <code>created_at</code> na semana corrente (mesma janela do recorte “esta semana” do script).</p><p><strong>Concluídas na semana:</strong> issues com <code>completed_at</code> na semana — <em>inclui tarefas criadas antes</em>, ou seja, tudo o que o time fechou nesta semana.</p><p><strong>Saldo</strong> = criadas − concluídas. <strong>Negativo</strong> (ex.: −17) significa que fecharam mais do que abriram novas na semana — em geral bom sinal para a fila. <strong>Positivo</strong> significa que entrou mais trabalho novo do que saiu concluído na semana.</p>'
   }
 };
 function openMetricHelp(key){
@@ -654,6 +680,156 @@ function buildInsightPreview(alerts,highs,maxN){
   return{preview,restAlerts:alerts.slice(ai),restHighs:highs.slice(hi)}
 }
 
+// ── Progresso sprint / GitHub Project ─────────────────────────────────────────
+function renderProductProgress(pp){
+  const el=document.getElementById('product-progress-block');
+  if(!el)return;
+  if(!pp||typeof pp!=='object'){el.innerHTML='';return;}
+
+  if(pp.error){
+    el.innerHTML=`<div class="pp-sec" aria-label="Progresso do sprint">
+      <span class="pp-sec-lead">Progresso do sprint</span>
+      <span style="font-weight:400;font-size:10px;color:var(--hint);text-transform:none;letter-spacing:0">GitHub Project</span>
+    </div>
+      <div class="pp-error">⚠️ ${esc(pp.error)}<br><span style="opacity:.9;font-size:11px;margin-top:8px;display:inline-block">Local: variáveis no arquivo <code>.env</code> na raiz do repo e rode <code>.venv/bin/python scripts/fetch_metrics.py</code> (ou <code>--product-only</code>). Produção: mesmos nomes em GitHub → Settings → Secrets → Actions.</span></div>`;
+    return;
+  }
+
+  const planned   =pp.planned   ||{count:0,items:[]};
+  const inProg    =pp.in_progress||{count:0,items:[]};
+  const completed =pp.completed  ||{count:0,items:[]};
+  const rate      =pp.completion_rate_pct;
+  const rateColor =rate==null?'#9CA3AF':rate>80?'#8B5CF6':'#EF4444';
+  const spr=pp.sprint||{};
+  const prev=pp.previous_sprint;
+  const sprintSub=spr.current?`<p class="pp-sub">Sprint atual: <strong style="color:var(--text)">${esc(spr.current)}</strong>${spr.previous?` · Sprint anterior: <strong style="color:var(--text)">${esc(spr.previous)}</strong>`:''}</p>`:'';
+
+  let compareRow='';
+  if(prev&&typeof prev==='object'&&spr.previous){
+    const pr=prev.completion_rate_pct,cr=rate;
+    const delta=(pr!=null&&cr!=null)?(cr-pr):null;
+    const dStr=delta==null?'—':(delta>0?'+'+delta:(delta===0?'0':String(delta)))+' pp';
+    const dCol=delta==null?'var(--muted)':delta>0?'var(--green)':delta<0?'var(--red)':'var(--muted)';
+    compareRow=`<div class="pp-compare" aria-label="Comparativo com sprint anterior">
+      <div><span class="pp-compare-lbl">Taxa (anterior)</span><span class="pp-compare-val">${pr!=null?pr+'%':'—'}</span></div>
+      <div><span class="pp-compare-lbl">Planejadas</span><span class="pp-compare-val">${(prev.planned||{}).count??0} → ${planned.count}</span></div>
+      <div><span class="pp-compare-lbl">Em execução</span><span class="pp-compare-val">${(prev.in_progress||{}).count??0} → ${inProg.count}</span></div>
+      <div><span class="pp-compare-lbl">Concluídas</span><span class="pp-compare-val">${(prev.completed||{}).count??0} → ${completed.count}</span></div>
+      <div><span class="pp-compare-lbl">Δ taxa</span><span class="pp-compare-val" style="color:${dCol}">${esc(dStr)}</span></div>
+    </div>`;
+  }
+
+  function ppList(items, showTime){
+    if(!items||!items.length)return`<div class="pp-empty">Nenhuma tarefa</div>`;
+    return items.map(i=>{
+      const assigneesStr=(i.assignees||[]).join(', ')||'Sem responsável';
+      let meta=`<span>${esc(assigneesStr)}</span>`;
+      if(showTime&&i.cycle_days!=null)meta+=`<span>${i.cycle_days}d</span>`;
+      if(!showTime&&i.due)meta+=`<span>Prazo: ${esc(String(i.due).slice(0,10))}</span>`;
+      return`<div class="pp-item"><span class="pp-item-title">${esc(i.title)}</span><div class="pp-item-meta">${meta}</div></div>`;
+    }).join('');
+  }
+
+  function ppCard(id, label, num, desc, color, items, showTime){
+    const listId='pp-list-'+id;
+    const btnId='pp-btn-'+id;
+    const listHtml=ppList(items, showTime);
+    return`<div class="pp-card">
+      <div class="pp-card-accent" style="background:${color}"></div>
+      <div class="pp-card-label">${label}</div>
+      <div class="pp-card-num" style="color:${color}">${num}</div>
+      <div class="pp-card-desc">${desc}</div>
+      <button type="button" class="pp-card-toggle" id="${btnId}" aria-expanded="false" aria-controls="${listId}" onclick="ppToggle('${id}')">
+        <span class="pp-card-toggle-chev">▸</span> Ver tarefas
+      </button>
+      <div id="${listId}" class="pp-card-list" style="display:none">${listHtml}</div>
+    </div>`;
+  }
+
+  const rateDisplay=rate!=null?rate+'%':'—';
+  const rateCard=`<div class="pp-card">
+    <div class="pp-card-accent" style="background:${rateColor}"></div>
+    <div class="pp-card-label">Taxa de conclusão</div>
+    <div class="pp-card-num" style="color:${rateColor}">${esc(rateDisplay)}</div>
+    <div class="pp-card-desc">${spr.current?'Eficiência do sprint':'Eficiência da semana'}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:auto;padding-top:8px">${completed.count} de ${planned.count} planejadas concluídas</div>
+  </div>`;
+
+  el.innerHTML=`
+    <div class="pp-sec" aria-label="Progresso do sprint">
+      <span class="pp-sec-lead">Progresso do sprint</span>
+      <span style="font-weight:400;font-size:10px;color:var(--hint);text-transform:none;letter-spacing:0">GitHub Project</span>
+    </div>
+    ${sprintSub}
+    ${compareRow}
+    <div class="pp-grid">
+      ${ppCard('planned',  'Tarefas Planejadas',   planned.count,   spr.current?'No sprint atual':'Para realizar esta semana', '#3B82F6', planned.items,   false)}
+      ${ppCard('inprog',   'Em Execução',           inProg.count,    'Em progresso agora',         '#F59E0B', inProg.items,    false)}
+      ${ppCard('done',     'Tarefas Concluídas',    completed.count, spr.current?'Na coluna Concluído deste sprint':'Finalizadas esta semana', '#10B981', completed.items, false)}
+      ${rateCard}
+    </div>`;
+}
+
+function ppToggle(id){
+  const btn=document.getElementById('pp-btn-'+id);
+  const list=document.getElementById('pp-list-'+id);
+  if(!btn||!list)return;
+  const open=btn.getAttribute('aria-expanded')==='true';
+  btn.setAttribute('aria-expanded',String(!open));
+  list.style.display=open?'none':'flex';
+  const chev=btn.querySelector('.pp-card-toggle-chev');
+  if(chev)chev.style.transform=open?'':'rotate(90deg)';
+  btn.querySelector('span:last-child')||btn.appendChild(document.createTextNode(''));
+  btn.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=open?' Ver tarefas':' Ocultar';});
+}
+
+// ── Priority tooltip ─────────────────────────────────────────────────────────
+const _priTip=(function(){
+  const el=document.createElement('div');
+  el.className='pri-tooltip';
+  el.style.cssText='display:none;position:fixed;z-index:9999;pointer-events:none';
+  document.body.appendChild(el);
+  return el;
+})();
+function _positionTip(e){
+  const w=_priTip.offsetWidth||200,h=_priTip.offsetHeight||80;
+  let x=e.clientX+14,y=e.clientY+14;
+  if(x+w>window.innerWidth-8)x=e.clientX-w-14;
+  if(y+h>window.innerHeight-8)y=e.clientY-h-14;
+  _priTip.style.left=x+'px';_priTip.style.top=y+'px';
+}
+function showPriTip(e,cell){
+  let tasks=[];try{tasks=JSON.parse(cell.dataset.tasks||'[]');}catch(_){}
+  const mn=cell.dataset.min,mx=cell.dataset.max;
+  let html='';
+  if(tasks.length){
+    html+=`<div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Últimas concluídas</div>`;
+    tasks.forEach(t=>{html+=`<div style="margin-bottom:4px;color:var(--text)">• ${esc(t)}</div>`;});
+  }
+  if(mn||mx){
+    html+=`<div style="margin-top:8px;border-top:.5px solid var(--border);padding-top:8px;display:flex;gap:14px;font-size:11px;color:var(--muted)">`;
+    if(mn)html+=`<span>Mín: <strong style="color:var(--green)">${mn}d</strong></span>`;
+    if(mx)html+=`<span>Máx: <strong style="color:var(--red)">${mx}d</strong></span>`;
+    html+=`</div>`;
+  }
+  if(!html)return;
+  _priTip.innerHTML=html;_priTip.style.display='block';_positionTip(e);
+}
+function movePriTip(e){_positionTip(e);}
+function hidePriTip(){_priTip.style.display='none';}
+
+function priCell(pb,color,addSep){
+  const sep=addSep?'pri-sep ':'';
+  if(!pb||pb.count===0)return`<td class="${sep}dim pri-cell" style="text-align:center">—</td>`;
+  const timeStr=pb.avg_days!=null?pb.avg_days+'d':'—';
+  const tasksJson=escAttr(JSON.stringify(pb.tasks||[]));
+  const mn=pb.min_days??'',mx=pb.max_days??'';
+  return`<td class="${sep}pri-cell" style="color:${color}"
+    data-tasks="${tasksJson}" data-min="${mn}" data-max="${mx}"
+    onmouseenter="showPriTip(event,this)" onmousemove="movePriTip(event)" onmouseleave="hidePriTip()"
+    >${pb.count}&thinsp;/&thinsp;${timeStr}</td>`;
+}
+
 function renderOps(data){
   const C=data.current,P=data.previous,ins=data.insights;
   document.getElementById('hdr-date').textContent=data.week_label;
@@ -677,19 +853,40 @@ function renderOps(data){
       <div class="kpi-value ${C.chronic_rollover===0?'kv-g':C.chronic_rollover<=1?'kv-a':'kv-r'}">${C.chronic_rollover}</div>
       <div class="kpi-delta">${dlt(C.chronic_rollover,P.chronic_rollover,true)} <span class="flat">vs sem. ant. (${P.chronic_rollover})</span></div></div>`;
 
+  const cw=C.created_week,cmp=C.completed_week,bal=C.balance_week;
+  const hasFlow=cw!=null&&cmp!=null&&bal!=null;
+  const balCls=hasFlow?(bal>0?'flow-week-val-bal-pos':'flow-week-val-bal-neg'):'';
+  const balStr=hasFlow?((bal>0?'+':'')+bal):'';
+  document.getElementById('flow-week-block').innerHTML=hasFlow
+    ?`<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px;width:100%">
+        <div class="flow-week-hdr"><span class="flow-week-title">Fluxo da semana</span><button type="button" class="help-q help-q-sm" onclick="openMetricHelp('flow_weekly')" aria-label="O que é fluxo da semana?">?</button></div>
+        <div class="flow-week-item"><span class="flow-week-lbl">Criadas</span><span class="flow-week-val">${cw}</span></div>
+        <div class="flow-week-item"><span class="flow-week-lbl">Concluídas</span><span class="flow-week-val">${cmp}</span></div>
+        <div class="flow-week-item"><span class="flow-week-lbl">Saldo</span><span class="flow-week-val ${balCls}">${balStr}</span></div>
+      </div>
+      <p class="flow-week-sub">Saldo = criadas − concluídas. Negativo: fechamos mais do que abrimos de novo nesta semana. Positivo: entrou mais trabalho novo do que saiu concluído.</p>`
+    :`<p class="flow-week-sub" style="margin:0">Atualize o <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">fetch_metrics.py</code> e regenere <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">data/latest.json</code> para ver criadas, concluídas e saldo.</p>`;
+
   const pm={};(P.areas||[]).forEach(a=>{pm[a.name]=a});
   document.getElementById('areas-body').innerHTML=C.areas.map(a=>{
     const pa=pm[a.name]||{};
     const ds=pa.score?sd(pa.score,a.score):'';
-    const cc=a.cycle_time>12?'#f56565':a.cycle_time>7?'#f5a623':'#3ecf8e';
+    const rv=a.rollover??0;
+    const rollCls=rv===0?'up':rv<=1?'kv-a':'down';
     const bc=a.score==='A'?'#3ecf8e':a.score==='B'?'#f5a623':a.score==='C'?'#fb923c':'#f56565';
     const rd=pa.rate!=null?` <span style="font-size:10px;color:${a.rate>pa.rate?'#3ecf8e':a.rate<pa.rate?'#f56565':'#4a4f6a'}">(${a.rate>pa.rate?'+':''}${a.rate-pa.rate}pp)</span>`:'';
     const od=a.overdue===0?`<span class="up">0</span>`:`<span class="${a.overdue>1?'down':'kv-a'}">${a.overdue}</span>`;
+    const pbd=a.priority_breakdown||{};
     return`<tr><td>${a.name}</td><td>${sp(a.score)}${ds}</td>
       <td class="dim">${a.rate}%${rd}<br><div style="margin-top:4px">${bbar(a.rate,bc)}</div></td>
       <td>${od}</td>
-      <td class="dim" style="color:${a.cycle_time?cc:'var(--hint)'}">${a.cycle_time?a.cycle_time+'d':'—'}</td>
-      <td class="dim">${a.backlog}</td></tr>`;
+      <td style="text-align:center;font-weight:600"><span class="${rollCls}">${rv}</span></td>
+      <td class="dim">${a.backlog}</td>
+      ${priCell(pbd.urgente,'#EF4444',true)}
+      ${priCell(pbd.alta,'#F97316',false)}
+      ${priCell(pbd.media,'#EAB308',false)}
+      ${priCell(pbd.baixa,'#3B82F6',false)}
+      ${priCell(pbd.sem,'#9CA3AF',false)}</tr>`;
   }).join('');
 
   document.getElementById('collab-grid').innerHTML=C.collaborators.map(c=>{
@@ -778,59 +975,6 @@ function renderOps(data){
       ${prevHtml}
     </div>
     ${detailsBlock}`;
-
-  const tr=data.trend||[];
-  const cw=C.created_week,cmp=C.completed_week,bal=C.balance_week;
-  const hasFlow=cw!=null&&cmp!=null&&bal!=null;
-  const balCls=hasFlow?(bal>0?'flow-week-val-bal-pos':'flow-week-val-bal-neg'):'';
-  const balStr=hasFlow?((bal>0?'+':'')+bal):'';
-  document.getElementById('flow-week-block').innerHTML=hasFlow
-    ?`<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:14px 28px;width:100%">
-        <div class="flow-week-hdr"><span class="flow-week-title">Fluxo da semana</span><button type="button" class="help-q help-q-sm" onclick="openMetricHelp('flow_weekly')" aria-label="O que é fluxo da semana?">?</button></div>
-        <div class="flow-week-item"><span class="flow-week-lbl">Criadas</span><span class="flow-week-val">${cw}</span></div>
-        <div class="flow-week-item"><span class="flow-week-lbl">Concluídas</span><span class="flow-week-val">${cmp}</span></div>
-        <div class="flow-week-item"><span class="flow-week-lbl">Saldo</span><span class="flow-week-val ${balCls}">${balStr}</span></div>
-      </div>
-      <p class="flow-week-sub">Saldo = criadas − concluídas. Negativo: fechamos mais do que abrimos de novo nesta semana. Positivo: entrou mais trabalho novo do que saiu concluído.</p>`
-    :`<p class="flow-week-sub" style="margin:0">Atualize o <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">fetch_metrics.py</code> e regenere <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">data/latest.json</code> para ver criadas, concluídas e saldo.</p>`;
-
-  function trendDone(t){
-    const n=Number(t.done);
-    return Number.isFinite(n)?n:0;
-  }
-  function trendRemaining(t){
-    const r=Number(t.remaining);
-    if(Number.isFinite(r))return Math.max(0,r);
-    const tot=Number(t.total),dn=Number(t.done);
-    if(Number.isFinite(tot)&&Number.isFinite(dn))return Math.max(0,tot-dn);
-    return 0;
-  }
-  new Chart(document.getElementById('trendChart'),{
-    type:'line',
-    data:{labels:tr.map(t=>t.week),datasets:[
-      {label:'Concluídas',data:tr.map(trendDone),borderColor:'#3ecf8e',backgroundColor:'rgba(62,207,142,.08)',tension:.35,pointRadius:4,pointBackgroundColor:'#3ecf8e',fill:true},
-      {label:'Abertas',data:tr.map(trendRemaining),borderColor:'#f5a623',backgroundColor:'transparent',tension:.35,pointRadius:4,pointBackgroundColor:'#f5a623',borderDash:[5,4]}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{
-        legend:{display:false},
-        tooltip:{callbacks:{afterBody(items){
-          const i=items[0]?.dataIndex;
-          if(i==null)return[];
-          const t=tr[i];
-          if(!t||t.created_week==null)return[];
-          const lines=[];
-          if(t.created_week!=null)lines.push('Criadas (semana): '+t.created_week);
-          if(t.completed_week!=null)lines.push('Concluídas (semana): '+t.completed_week);
-          if(t.balance_week!=null)lines.push('Saldo: '+(t.balance_week>0?'+':'')+t.balance_week);
-          return lines;
-        }}}
-      },
-      scales:{
-        x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7b8099',font:{size:11}}},
-        y:{position:'left',beginAtZero:true,min:0,grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#7b8099',font:{size:11},precision:0,stepSize:1}}
-      }}
-  });
 }
 
 function renderOKRs(data){
@@ -1353,10 +1497,15 @@ fetch('data/improvements.json?v='+Date.now())
   .catch(()=>{_impRemote=[];mergeAndRender();});
 
 // ── OPERAÇÕES ──────────────────────────────────────────────────────────────
-fetch('data/latest.json?v='+Date.now())
-  .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
-  .then(d=>{renderOps(d);renderOKRs(d);renderCOO(d)})
-  .catch(e=>{document.getElementById('tab-ops').innerHTML=`<p style="color:#f56565;padding:40px 0">Erro ao carregar dados: ${e.message}</p>`});
+function loadDashboard(){
+  return fetch('data/latest.json?v='+Date.now())
+    .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
+    .then(d=>{renderOps(d);renderOKRs(d);renderCOO(d);renderProductProgress(d.product_progress);})
+    .catch(e=>{document.getElementById('tab-ops').innerHTML=`<p style="color:#f56565;padding:40px 0">Erro ao carregar dados: ${e.message}</p>`;});
+}
+loadDashboard();
+// Polling: re-fetch a cada 5 minutos (útil quando o Action atualiza o JSON sem reload manual)
+setInterval(loadDashboard, 5*60*1000);
 </script>
 </body>
 </html>

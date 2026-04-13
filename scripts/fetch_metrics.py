@@ -9,19 +9,52 @@ import os
 import json
 import math
 import time
+import unicodedata
 import requests
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from collections import defaultdict
 
-# ── Configuração ──────────────────────────────────────────────────────────────
-PLANE_BASE     = "https://api.plane.so/api/v1"
-PLANE_TOKEN    = os.environ["PLANE_API_TOKEN"]
-PLANE_SLUG     = os.environ["PLANE_WORKSPACE_SLUG"]   # ex: "beemessage"
-PROJECT_IDS    = os.environ["PLANE_PROJECT_IDS"].split(",")  # ex: "proj-uuid1,proj-uuid2"
-ANTHROPIC_KEY  = os.environ["ANTHROPIC_API_KEY"]
+try:
+    from dotenv import load_dotenv
+    _repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    load_dotenv(os.path.join(_repo_root, ".env"))
+except ImportError:
+    pass
 
-HEADERS_PLANE  = {"X-API-Key": PLANE_TOKEN, "Content-Type": "application/json"}
-HEADERS_AI     = {"x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json"}
+# ── Configuração ──────────────────────────────────────────────────────────────
+PLANE_BASE = "https://api.plane.so/api/v1"
+
+
+def _headers_plane():
+    return {"X-API-Key": os.environ["PLANE_API_TOKEN"], "Content-Type": "application/json"}
+
+
+def _plane_slug():
+    return os.environ["PLANE_WORKSPACE_SLUG"]
+
+
+def _project_ids():
+    return os.environ["PLANE_PROJECT_IDS"].split(",")
+
+
+def _anthropic_headers():
+    return {
+        "x-api-key": os.environ["ANTHROPIC_API_KEY"],
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+    }
+
+
+def _anthropic_model():
+    return (os.environ.get("ANTHROPIC_MODEL") or "").strip() or "claude-haiku-4-5"
+
+
+def _anthropic_max_tokens():
+    raw = (os.environ.get("ANTHROPIC_MAX_TOKENS") or "").strip()
+    try:
+        return max(256, min(4096, int(raw))) if raw else 768
+    except ValueError:
+        return 768
 
 NOW            = datetime.now(timezone.utc)
 WEEK_START     = (NOW - timedelta(days=NOW.weekday() + 1)).replace(hour=0, minute=0, second=0)  # segunda passada
@@ -30,9 +63,9 @@ PREV_WEEK_START= WEEK_START - timedelta(days=7)
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 def plane_get(path, params=None):
-    url = f"{PLANE_BASE}/workspaces/{PLANE_SLUG}/{path}"
+    url = f"{PLANE_BASE}/workspaces/{_plane_slug()}/{path}"
     for attempt in range(5):
-        r = requests.get(url, headers=HEADERS_PLANE, params=params or {})
+        r = requests.get(url, headers=_headers_plane(), params=params or {})
         if r.status_code == 429 and attempt < 4:
             raw = r.headers.get("Retry-After", "45")
             try:
@@ -69,10 +102,17 @@ def safe_round(v, d=1):
     return round(v, d)
 
 
+PRIORITY_MAP = {
+    "urgent": "urgente", "high": "alta", "medium": "media",
+    "low": "baixa", "none": "sem", None: "sem", "": "sem",
+}
+PRIORITY_KEYS = ["urgente", "alta", "media", "baixa", "sem"]
+
+
 # ── Fetch all issues ──────────────────────────────────────────────────────────
 def fetch_all_issues():
     issues = []
-    for pid in PROJECT_IDS:
+    for pid in _project_ids():
         page = 1
         while True:
             batch = plane_get(f"projects/{pid}/issues/", {"per_page": 100, "page": page, "expand": "state,assignees,labels"})
@@ -86,7 +126,7 @@ def fetch_all_issues():
 
 def fetch_states():
     states = {}
-    for pid in PROJECT_IDS:
+    for pid in _project_ids():
         for s in plane_get(f"projects/{pid}/states/"):
             states[s["id"]] = s
     return states
@@ -158,8 +198,18 @@ def compute_metrics(issues, all_issues=None):
                  if not i["_is_done"] and i["_created"] and i["_created"] < PREV_WEEK_START]
     n_chronic = len(chronic)
 
-    # Per-area metrics
-    areas = defaultdict(lambda: {"total":0,"done":0,"overdue":[],"cycle_times":[],"backlog":0})
+    chronic_by_area = defaultdict(int)
+    for i in (all_issues or issues):
+        if not i["_is_done"] and i["_created"] and i["_created"] < PREV_WEEK_START:
+            chronic_by_area[i["_area"]] += 1
+
+    # Per-area metrics (including priority breakdown)
+    def _area_default():
+        return {
+            "total": 0, "done": 0, "overdue": [], "cycle_times": [], "backlog": 0,
+            "pri_done": {k: {"cts": [], "tasks": []} for k in PRIORITY_KEYS},
+        }
+    areas = defaultdict(_area_default)
     for i in issues:
         a = i["_area"]
         areas[a]["total"] += 1
@@ -167,6 +217,10 @@ def compute_metrics(issues, all_issues=None):
             areas[a]["done"] += 1
             if i["_cycle_time"]:
                 areas[a]["cycle_times"].append(i["_cycle_time"])
+            pri = PRIORITY_MAP.get(i.get("priority") or "none", "sem")
+            areas[a]["pri_done"][pri]["tasks"].append(i.get("name", "?")[:60])
+            if i["_cycle_time"] is not None:
+                areas[a]["pri_done"][pri]["cts"].append(i["_cycle_time"])
         if i["_overdue"]:
             areas[a]["overdue"].append(i)
         if not i["_is_done"]:
@@ -177,16 +231,28 @@ def compute_metrics(issues, all_issues=None):
         t = d["total"]
         dn = d["done"]
         r = round(dn / t * 100) if t else 0
-        ct = safe_round(sum(d["cycle_times"]) / len(d["cycle_times"])) if d["cycle_times"] else None
         n_od = len(d["overdue"])
+        n_roll = chronic_by_area.get(name, 0)
         # Score: A=no overdue + rate>=90; B=0-1 overdue + rate>=75; C=1-2 overdue or rate>=60; D=else
         if n_od == 0 and r >= 90:   score = "A"
         elif n_od <= 1 and r >= 75: score = "B"
         elif n_od <= 2 and r >= 60: score = "C"
         else:                        score = "D"
+        pri_breakdown = {}
+        for pk in PRIORITY_KEYS:
+            pd = d["pri_done"][pk]
+            cts = pd["cts"]
+            pri_breakdown[pk] = {
+                "count": len(pd["tasks"]),
+                "avg_days": safe_round(sum(cts) / len(cts)) if cts else None,
+                "min_days": safe_round(min(cts)) if cts else None,
+                "max_days": safe_round(max(cts)) if cts else None,
+                "tasks": pd["tasks"][-3:][::-1],
+            }
         areas_list.append({
             "name": name, "score": score, "total": t, "done": dn,
-            "rate": r, "overdue": n_od, "cycle_time": ct, "backlog": d["backlog"]
+            "rate": r, "overdue": n_od, "rollover": n_roll, "backlog": d["backlog"],
+            "priority_breakdown": pri_breakdown,
         })
 
     # Per-assignee metrics
@@ -287,10 +353,12 @@ Gere um JSON com esta estrutura exata (sem markdown, só JSON puro):
   "action_items": ["ação concreta prioritária 1 para o COO", "ação 2"]
 }}"""
 
+    _m, _mt = _anthropic_model(), _anthropic_max_tokens()
+    print(f"   → API Anthropic: modelo {_m}, max_tokens={_mt}")
     resp = requests.post(
         "https://api.anthropic.com/v1/messages",
-        headers=HEADERS_AI,
-        json={"model": "claude-sonnet-4-20250514", "max_tokens": 1000,
+        headers=_anthropic_headers(),
+        json={"model": _m, "max_tokens": _mt,
               "messages": [{"role": "user", "content": prompt}]}
     )
     resp.raise_for_status()
@@ -332,49 +400,712 @@ def apply_week_flow_metrics(current, this_week, all_issues):
     current["balance_week"] = created_week - completed_week
 
 
-def trend_row_from_snapshot(snap):
-    cur = (snap or {}).get("current") or {}
-    if not isinstance(cur, dict):
-        cur = {}
-    total = int(cur.get("total") or 0)
-    done = int(cur.get("done") or 0)
-    row = {
-        "week": (snap or {}).get("week_label", "") or "",
-        "rate": cur.get("rate", 0) or 0,
-        "overdue": cur.get("overdue", 0) or 0,
-        "cycle_time": cur.get("avg_cycle_time") or 0,
-        "total": total,
-        "done": done,
-        "remaining": max(0, total - done),
-    }
-    if "created_week" in cur:
-        row["created_week"] = cur.get("created_week")
-    if "completed_week" in cur:
-        row["completed_week"] = cur.get("completed_week")
-    if "balance_week" in cur:
-        row["balance_week"] = cur.get("balance_week")
-    return row
+# ── GitHub product progress ───────────────────────────────────────────────────
+
+# Heurística padrão para mapear nomes de label para chaves de prioridade.
+# Pode ser sobrescrita via GITHUB_PRODUCT_PRIORITY_<CHAVE>=csv de nomes exatos.
+_GH_PRI_PATTERNS: dict[str, list[str]] = {
+    "urgente": ["urgent", "urgente", "crítico", "critico", "critical", "p0"],
+    "alta":    ["high", "alta", "p1"],
+    "media":   ["medium", "média", "media", "normal", "p2"],
+    "baixa":   ["low", "baixa", "minor", "p3"],
+}
 
 
-def trend_row_current(week_label, current):
-    total = int(current.get("total") or 0)
-    done = int(current.get("done") or 0)
-    row = {
-        "week": week_label,
-        "rate": current.get("rate", 0),
-        "overdue": current.get("overdue", 0),
-        "cycle_time": current.get("avg_cycle_time") or 0,
-        "total": total,
-        "done": done,
-        "remaining": max(0, total - done),
+def github_priority_from_labels(label_names: list[str], product_label: str = "") -> str:
+    """Retorna a chave de PRIORITY_KEYS mais adequada a partir dos nomes de labels da issue."""
+    # Lê overrides opcionais via env: GITHUB_PRODUCT_PRIORITY_URGENTE, ...ALTA, etc.
+    overrides: dict[str, set[str]] = {}
+    for pk in PRIORITY_KEYS[:-1]:   # sem "sem"
+        env_val = os.environ.get(f"GITHUB_PRODUCT_PRIORITY_{pk.upper()}", "")
+        if env_val:
+            overrides[pk] = {v.strip().lower() for v in env_val.split(",") if v.strip()}
+
+    lowers = {n.lower() for n in label_names if n.lower() != product_label.lower()}
+
+    for pk in ["urgente", "alta", "media", "baixa"]:
+        candidates = overrides.get(pk) or {p for p in _GH_PRI_PATTERNS[pk]}
+        if lowers & candidates:
+            return pk
+    return "sem"
+
+
+def _empty_pp_extras() -> dict:
+    """Campos de rollover/cycle/prioridade com valores nulos para retornos de erro."""
+    empty_bd = {k: {"count": 0, "avg_days": None, "min_days": None, "max_days": None, "tasks": []}
+                for k in PRIORITY_KEYS}
+    return {
+        "rollover": 0,
+        "avg_cycle_time_sprint": None,
+        "priority_breakdown": empty_bd,
+        "sprint": {"current": None, "previous": None},
+        "previous_sprint": None,
     }
-    if "created_week" in current:
-        row["created_week"] = current.get("created_week")
-    if "completed_week" in current:
-        row["completed_week"] = current.get("completed_week")
-    if "balance_week" in current:
-        row["balance_week"] = current.get("balance_week")
-    return row
+
+
+def _gql_escape(s: str) -> str:
+    return s.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def _new_pp_bucket() -> dict:
+    return {
+        "planned": [],
+        "in_progress": [],
+        "completed": [],
+        "rollover": 0,
+        "pri_done": {k: {"cts": [], "tasks": []} for k in PRIORITY_KEYS},
+    }
+
+
+def _normalize_sprint_title(s: str) -> str:
+    """Normaliza título de sprint para comparação: remove acentos compostos, espaços extras e padroniza caixa."""
+    s = unicodedata.normalize("NFKC", s)
+    return " ".join(s.split()).lower()
+
+
+def _sprint_title_from_fv(sprint_fv: dict | None) -> str | None:
+    """Extrai título da iteração ou nome do single select do campo Sprint no Project v2."""
+    if not sprint_fv or not isinstance(sprint_fv, dict):
+        return None
+    t = (sprint_fv.get("title") or sprint_fv.get("name") or "").strip()
+    return t or None
+
+
+def _finalize_pp_slice(
+    planned_items: list,
+    in_progress_items: list,
+    completed_items: list,
+    rollover_count: int,
+    pri_done: dict,
+) -> dict:
+    planned_count = len(planned_items)
+    completed_count = len(completed_items)
+    rate = round(completed_count / planned_count * 100) if planned_count else None
+    all_cts = [i["cycle_days"] for i in completed_items if i.get("cycle_days") is not None]
+    avg_ct = safe_round(sum(all_cts) / len(all_cts)) if all_cts else None
+    priority_breakdown: dict[str, dict] = {}
+    for pk in PRIORITY_KEYS:
+        pd = pri_done[pk]
+        cts = pd["cts"]
+        priority_breakdown[pk] = {
+            "count": len(pd["tasks"]),
+            "avg_days": safe_round(sum(cts) / len(cts)) if cts else None,
+            "min_days": safe_round(min(cts)) if cts else None,
+            "max_days": safe_round(max(cts)) if cts else None,
+            "tasks": pd["tasks"][:3],
+        }
+    return {
+        "planned": {"count": planned_count, "items": planned_items},
+        "in_progress": {"count": len(in_progress_items), "items": in_progress_items},
+        "completed": {"count": completed_count, "items": completed_items},
+        "completion_rate_pct": rate,
+        "rollover": rollover_count,
+        "avg_cycle_time_sprint": avg_ct,
+        "priority_breakdown": priority_breakdown,
+    }
+
+
+def _route_item_to_bucket(
+    bucket: dict,
+    status_lower: str,
+    item: dict,
+    pri_key: str,
+    created_dt,
+    closed_dt,
+    sprint_mode: bool,
+    rollover_cutoff,
+    status_planned: set,
+    status_in_progress: set,
+    status_done: set,
+) -> bool:
+    """Acrescenta item ao bucket conforme coluna Status (e regra de concluídas calendário vs sprint). Retorna se classificou."""
+    pri_done = bucket["pri_done"]
+    if status_lower in status_done:
+        if sprint_mode:
+            cd = safe_round(days_between(created_dt, closed_dt)) if created_dt and closed_dt else None
+            item = {**item, "cycle_days": cd}
+            bucket["completed"].append(item)
+            pri_done[pri_key]["tasks"].append(item["title"])
+            if cd is not None:
+                pri_done[pri_key]["cts"].append(cd)
+            return True
+        if closed_dt and WEEK_START <= closed_dt <= NOW:
+            cd = safe_round(days_between(created_dt, closed_dt)) if created_dt else None
+            item = {**item, "cycle_days": cd}
+            bucket["completed"].append(item)
+            pri_done[pri_key]["tasks"].append(item["title"])
+            if cd is not None:
+                pri_done[pri_key]["cts"].append(cd)
+            return True
+        return False
+    if status_lower in status_in_progress:
+        bucket["in_progress"].append(item)
+        if created_dt and rollover_cutoff and created_dt < rollover_cutoff:
+            bucket["rollover"] += 1
+        return True
+    if status_lower in status_planned:
+        bucket["planned"].append(item)
+        if created_dt and rollover_cutoff and created_dt < rollover_cutoff:
+            bucket["rollover"] += 1
+        return True
+    return False
+
+
+def _github_resolve_sprint_titles(
+    gh_headers: dict,
+    owner_field: str,
+    owner: str,
+    project_number: str,
+    sprint_field_name: str,
+    env_current: str,
+    env_previous: str,
+    sprint_auto: bool,
+) -> tuple[str, str]:
+    """
+    Preenche títulos de sprint (campo de iteração Project v2) quando env está incompleto e sprint_auto está ativo.
+    Usa startDate + duration (UTC); sprint atual = iteração que contém hoje; anterior = maior término antes do início do atual.
+    """
+    ec = env_current.strip()
+    ep = env_previous.strip()
+    if not sprint_auto:
+        return ec, ep
+    if ec and ep:
+        return ec, ep
+
+    owner_g = _gql_escape(owner)
+    try:
+        pn = int(str(project_number).strip())
+    except ValueError:
+        return ec, ep
+
+    query = f"""
+    query {{
+      {owner_field}(login: "{owner_g}") {{
+        projectV2(number: {pn}) {{
+          fields(first: 50) {{
+            nodes {{
+              __typename
+              ... on ProjectV2IterationField {{
+                name
+                configuration {{
+                  iterations {{ id title startDate duration }}
+                  completedIterations {{ id title startDate duration }}
+                }}
+              }}
+            }}
+          }}
+        }}
+      }}
+    }}"""
+    try:
+        resp = requests.post(
+            "https://api.github.com/graphql",
+            headers=gh_headers,
+            json={"query": query},
+            timeout=30,
+        )
+        resp.raise_for_status()
+        gql = resp.json()
+        if gql.get("errors"):
+            raise RuntimeError(gql["errors"][0].get("message", str(gql["errors"])))
+    except Exception as ex:
+        print(f"   ⚠️  Auto-sprint (GraphQL): {ex}")
+        return ec, ep
+
+    nodes = (
+        (((gql.get("data") or {}).get(owner_field) or {}).get("projectV2") or {}).get("fields") or {}
+    ).get("nodes") or []
+
+    iter_field = None
+    for node in nodes:
+        if node.get("__typename") != "ProjectV2IterationField":
+            continue
+        if node.get("name") == sprint_field_name:
+            iter_field = node
+            break
+    if not iter_field:
+        for node in nodes:
+            if node.get("__typename") == "ProjectV2IterationField":
+                if (node.get("name") or "").strip().lower() == sprint_field_name.lower():
+                    iter_field = node
+                    break
+
+    if not iter_field:
+        return ec, ep
+
+    cfg = iter_field.get("configuration") or {}
+    raw = list(cfg.get("iterations") or []) + list(cfg.get("completedIterations") or [])
+    seen: set[str] = set()
+    rows: list[tuple[date, date, str]] = []
+    for it in raw:
+        iid = str(it.get("id") or "")
+        if iid and iid in seen:
+            continue
+        if iid:
+            seen.add(iid)
+        sd_s = ((it.get("startDate") or "")[:10]).strip()
+        if not sd_s:
+            continue
+        try:
+            sd = date.fromisoformat(sd_s)
+        except ValueError:
+            continue
+        dur = int(it.get("duration") or 0)
+        if dur < 1:
+            dur = 1
+        end = sd + timedelta(days=dur - 1)
+        title = (it.get("title") or "").strip()
+        if title:
+            rows.append((sd, end, title))
+
+    rows.sort(key=lambda r: r[0])
+    if not rows:
+        return ec, ep
+
+    today = NOW.date()
+    if not ec:
+        for sd, end, title in rows:
+            if sd <= today <= end:
+                ec = title
+                break
+
+    if not ep and ec:
+        cur_start: date | None = None
+        for sd, _end, title in rows:
+            if title == ec:
+                cur_start = sd
+                break
+        if cur_start is not None:
+            best_end: date | None = None
+            best_title = ""
+            for sd, end, title in rows:
+                if end < cur_start and (best_end is None or end > best_end):
+                    best_end = end
+                    best_title = title
+            ep = best_title
+
+    return ec, ep
+
+
+def build_product_progress():
+    """
+    Busca issues no GitHub e agrupa por status no board (Project v2 ou repo).
+
+    Suporta dois modos configuráveis via env:
+      Modo A (Project v2, recomendado): define GITHUB_PRODUCT_PROJECT_NUMBER — todas as issues do board
+      Modo B (issues no repo + label):   define GITHUB_PRODUCT_OWNER + GITHUB_PRODUCT_REPO
+
+    Variáveis de ambiente:
+      GITHUB_PRODUCT_TOKEN         – PAT com acesso a issues (e projects se modo A)
+      GITHUB_PRODUCT_OWNER         – login de usuário ou organização
+      GITHUB_PRODUCT_REPO          – nome do repositório (modo B)
+      GITHUB_PRODUCT_PROJECT_NUMBER– número do project v2 (modo A)
+      GITHUB_PRODUCT_LABEL         – só Modo B: filtra issues na API REST (default Produto se ausente). Ignorado no Modo A.
+      GITHUB_PRODUCT_STATUS_PLANNED    – nomes de status (separados por vírgula, case-insensitive)
+                                        que representam "planejadas" (default: Backlog,Todo,Planejado,Planejada)
+      GITHUB_PRODUCT_STATUS_IN_PROGRESS– default: In progress,Em progresso,In Progress
+      GITHUB_PRODUCT_STATUS_DONE       – default: Done,Concluído,Concluída,Done,Feito
+      GITHUB_PRODUCT_PRIORITY_<CHAVE>  – lista CSV de nomes de label que mapeiam para a prioridade
+                                        (opcional; usa heurística embutida se ausente)
+      GITHUB_PRODUCT_SPRINT_FIELD_NAME – nome do campo de iteração no Project (default: Sprint)
+      GITHUB_PRODUCT_SPRINT_CURRENT    – título do sprint atual (ex.: S2 Abril); ativa modo sprint
+      GITHUB_PRODUCT_SPRINT_PREVIOUS   – sprint anterior para comparativo (opcional)
+      GITHUB_PRODUCT_SPRINT_AUTO       – 1 (default): preenche CURRENT/PREVIOUS vazios via campo Iteration no Project
+    """
+    _base_error = {"source": "github", "planned": {"count": 0, "items": []},
+                   "in_progress": {"count": 0, "items": []},
+                   "completed": {"count": 0, "items": []}, "completion_rate_pct": None}
+
+    token = (os.environ.get("GITHUB_PRODUCT_TOKEN") or os.environ.get("GITHUB_TOKEN") or "").strip()
+    if not token:
+        print("   ⚠️  GITHUB_PRODUCT_TOKEN não configurado — seção Progresso Sprint desativada")
+        return {
+            **_base_error,
+            "error": (
+                "Sem token GitHub: no .env local use GITHUB_PRODUCT_TOKEN=… (ou GITHUB_TOKEN=…) na raiz do repo; "
+                "no Actions crie o secret GITHUB_PRODUCT_TOKEN e rode o workflow."
+            ),
+            **_empty_pp_extras(),
+        }
+
+    owner = (os.environ.get("GITHUB_PRODUCT_OWNER") or "").strip()
+    repo = (os.environ.get("GITHUB_PRODUCT_REPO") or "").strip()
+    project_number = (os.environ.get("GITHUB_PRODUCT_PROJECT_NUMBER") or "").strip()
+    mode_a = bool(project_number and owner)
+
+    if mode_a:
+        label = ""
+    elif "GITHUB_PRODUCT_LABEL" in os.environ:
+        label = os.environ.get("GITHUB_PRODUCT_LABEL", "").strip()
+    else:
+        label = "Produto"
+
+    sprint_field = (os.environ.get("GITHUB_PRODUCT_SPRINT_FIELD_NAME") or "Sprint").strip() or "Sprint"
+    sprint_current = (os.environ.get("GITHUB_PRODUCT_SPRINT_CURRENT") or "").strip()
+    sprint_previous = (os.environ.get("GITHUB_PRODUCT_SPRINT_PREVIOUS") or "").strip()
+
+    raw_auto = (os.environ.get("GITHUB_PRODUCT_SPRINT_AUTO") or "1").strip().lower()
+    sprint_auto = raw_auto not in ("0", "false", "no", "off")
+
+    gh_headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+    owner_field = ""
+    if mode_a:
+        owner_type = os.environ.get("GITHUB_PRODUCT_OWNER_TYPE", "").lower()
+        if not owner_type:
+            test = requests.get(f"https://api.github.com/orgs/{owner}", headers=gh_headers, timeout=10)
+            owner_type = "organization" if test.status_code == 200 else "user"
+        owner_field = "organization" if owner_type == "organization" else "user"
+        sc0, sp0 = sprint_current, sprint_previous
+        sprint_current, sprint_previous = _github_resolve_sprint_titles(
+            gh_headers,
+            owner_field,
+            owner,
+            project_number,
+            sprint_field,
+            sprint_current,
+            sprint_previous,
+            sprint_auto,
+        )
+        if sprint_auto and (sc0, sp0) != (sprint_current, sprint_previous):
+            print(
+                f"   GitHub sprint (auto): atual={sprint_current or '—'} · anterior={sprint_previous or '—'}"
+            )
+
+    sprint_field_q = _gql_escape(sprint_field)
+    use_sprint_mode = bool(sprint_current)
+
+    if use_sprint_mode and not mode_a:
+        print("   ⚠️  GITHUB_PRODUCT_SPRINT_CURRENT exige Project v2 (OWNER + PROJECT_NUMBER)")
+        return {
+            **_base_error,
+            "error": "GITHUB_PRODUCT_SPRINT_CURRENT requer Modo A: GITHUB_PRODUCT_OWNER e GITHUB_PRODUCT_PROJECT_NUMBER.",
+            **_empty_pp_extras(),
+        }
+
+    # Defaults alinhados a boards PT-BR (BeeMessage); ainda compatíveis com nomes em inglês.
+    def _status_csv(key: str, default: str) -> set:
+        raw = os.environ.get(key)
+        if raw is None or not str(raw).strip():
+            raw = default
+        return {s.strip().lower() for s in raw.split(",") if s.strip()}
+
+    _def_planned = "backlog,a fazer,todo,planejado,planejada"
+    _def_prog = "em andamento,aguardando aprovação,in progress,em progresso,in_progress"
+    _def_done = "concluído,concluída,done,feito"
+    status_planned     = _status_csv("GITHUB_PRODUCT_STATUS_PLANNED",     _def_planned)
+    status_in_progress = _status_csv("GITHUB_PRODUCT_STATUS_IN_PROGRESS", _def_prog)
+    status_done        = _status_csv("GITHUB_PRODUCT_STATUS_DONE",        _def_done)
+
+    def _normalize_item(issue_or_node):
+        """Normaliza para o formato base { title, assignees, cycle_days, due, priority }."""
+        title     = (issue_or_node.get("title") or "?")[:100]
+        assignees = issue_or_node.get("assignees") or []
+        if isinstance(assignees, dict):
+            assignees = [a.get("login", "") for a in assignees.get("nodes", [])]
+        elif isinstance(assignees, list):
+            assignees = [a.get("login", "") for a in assignees if isinstance(a, dict)]
+        return {"title": title, "assignees": [a for a in assignees if a], "cycle_days": None, "due": None, "priority": "sem"}
+
+    def _label_names_gql(content: dict) -> list[str]:
+        return [l.get("name", "") for l in (content.get("labels") or {}).get("nodes", [])]
+
+    def _label_names_rest(iss: dict) -> list[str]:
+        return [l.get("name", "") for l in (iss.get("labels") or [])]
+
+    bucket_cur = _new_pp_bucket()
+    bucket_prev = _new_pp_bucket() if sprint_previous else None
+    bucket_legacy = _new_pp_bucket()  # Modo A sem sprint ou Modo B
+
+    rollover_cutoff = PREV_WEEK_START
+
+    # Pré-normaliza os títulos de sprint para comparação robusta
+    sprint_current_norm = _normalize_sprint_title(sprint_current) if sprint_current else ""
+    sprint_previous_norm = _normalize_sprint_title(sprint_previous) if sprint_previous else ""
+
+    try:
+        # ── Modo A: GitHub Project v2 ────────────────────────────────────────
+        if project_number and owner:
+            mode_msg = f"sprint '{sprint_current}'" if use_sprint_mode else "semana calendário"
+            print(f"   GitHub Project #{project_number} ({owner}) — {mode_msg}…")
+            owner_q = _gql_escape(owner)
+            pp_stats = {"skipped_sprint": 0, "unknown_status": 0, "empty_status": 0}
+            cursor = None
+            while True:
+                after_arg = f', after: "{cursor}"' if cursor else ""
+                query = f"""
+                query {{
+                  {owner_field}(login: "{owner_q}") {{
+                    projectV2(number: {project_number}) {{
+                      title
+                      items(first: 100{after_arg}) {{
+                        pageInfo {{ hasNextPage endCursor }}
+                        nodes {{
+                          type
+                          statusVal: fieldValueByName(name: "Status") {{
+                            ... on ProjectV2ItemFieldSingleSelectValue {{ name }}
+                          }}
+                          sprintVal: fieldValueByName(name: "{sprint_field_q}") {{
+                            ... on ProjectV2ItemFieldIterationValue {{ title }}
+                            ... on ProjectV2ItemFieldSingleSelectValue {{ name }}
+                          }}
+                          content {{
+                            ... on Issue {{
+                              title
+                              state
+                              createdAt
+                              closedAt
+                              dueOn: milestone {{ dueOn }}
+                              assignees(first: 5) {{ nodes {{ login }} }}
+                              labels(first: 10) {{ nodes {{ name }} }}
+                            }}
+                          }}
+                        }}
+                      }}
+                    }}
+                  }}
+                }}"""
+                resp = requests.post("https://api.github.com/graphql",
+                                     headers=gh_headers, json={"query": query}, timeout=30)
+                resp.raise_for_status()
+                gql = resp.json()
+                if gql.get("errors"):
+                    raise RuntimeError(gql["errors"][0].get("message", str(gql["errors"])))
+                project_data = (gql.get("data") or {}).get(owner_field, {}).get("projectV2") or {}
+                items_page   = project_data.get("items") or {}
+                nodes        = items_page.get("nodes") or []
+
+                for node in nodes:
+                    if node.get("type") != "ISSUE":
+                        continue
+                    content = node.get("content") or {}
+                    if not content:
+                        continue
+
+                    if label:
+                        issue_label_names = _label_names_gql(content)
+                        if label.lower() not in [n.lower() for n in issue_label_names]:
+                            continue
+                    else:
+                        issue_label_names = _label_names_gql(content)
+
+                    status_raw   = ((node.get("statusVal") or {}).get("name") or "").strip()
+                    status_lower = status_raw.lower()
+                    created_dt   = parse_dt(content.get("createdAt"))
+                    closed_dt    = parse_dt(content.get("closedAt"))
+                    due_str      = (content.get("dueOn") or {}).get("dueOn") if content.get("dueOn") else None
+                    pri_key      = github_priority_from_labels(issue_label_names, label)
+                    item         = _normalize_item(content)
+                    item["due"]  = due_str
+                    item["priority"] = pri_key
+
+                    sprint_title_raw = _sprint_title_from_fv(node.get("sprintVal"))
+                    sprint_title_norm = _normalize_sprint_title(sprint_title_raw) if sprint_title_raw else ""
+
+                    if use_sprint_mode:
+                        if sprint_title_norm == sprint_current_norm:
+                            placed = _route_item_to_bucket(
+                                bucket_cur, status_lower, item, pri_key, created_dt, closed_dt,
+                                True, rollover_cutoff, status_planned, status_in_progress, status_done,
+                            )
+                            if not placed:
+                                if status_lower:
+                                    pp_stats["unknown_status"] += 1
+                                else:
+                                    pp_stats["empty_status"] += 1
+                        elif bucket_prev and sprint_title_norm == sprint_previous_norm:
+                            placed = _route_item_to_bucket(
+                                bucket_prev, status_lower, item, pri_key, created_dt, closed_dt,
+                                True, rollover_cutoff, status_planned, status_in_progress, status_done,
+                            )
+                            if not placed:
+                                if status_lower:
+                                    pp_stats["unknown_status"] += 1
+                                else:
+                                    pp_stats["empty_status"] += 1
+                        else:
+                            pp_stats["skipped_sprint"] += 1
+                    else:
+                        placed = _route_item_to_bucket(
+                            bucket_legacy, status_lower, item, pri_key, created_dt, closed_dt,
+                            False, rollover_cutoff, status_planned, status_in_progress, status_done,
+                        )
+                        if not placed:
+                            if status_lower:
+                                pp_stats["unknown_status"] += 1
+                            else:
+                                pp_stats["empty_status"] += 1
+
+                page_info = items_page.get("pageInfo") or {}
+                if page_info.get("hasNextPage"):
+                    cursor = page_info.get("endCursor")
+                else:
+                    break
+
+            tot_diag = sum(pp_stats.values())
+            if tot_diag:
+                print(
+                    f"   GitHub board (diagn.): fora_do_sprint={pp_stats['skipped_sprint']} | "
+                    f"status_vazio={pp_stats['empty_status']} | "
+                    f"status_desconhecido={pp_stats['unknown_status']}"
+                )
+
+        # ── Modo B: Issues REST (sem campo Sprint no project) ──────────────
+        elif owner and repo:
+            if use_sprint_mode:
+                return {
+                    **_base_error,
+                    "error": "Filtro por sprint só funciona com GitHub Project v2 (GITHUB_PRODUCT_PROJECT_NUMBER).",
+                    **_empty_pp_extras(),
+                }
+            lbl_txt = f"label={label}" if label else "todas as issues"
+            print(f"   GitHub repo {owner}/{repo} ({lbl_txt})…")
+            week_str = WEEK_START.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+            page = 1
+            while True:
+                params: dict = {"state": "open", "per_page": 100, "page": page}
+                if label:
+                    params["labels"] = label
+                r = requests.get(
+                    f"https://api.github.com/repos/{owner}/{repo}/issues",
+                    headers=gh_headers, timeout=30,
+                    params=params,
+                )
+                r.raise_for_status()
+                batch = r.json()
+                if not batch:
+                    break
+                for iss in batch:
+                    if iss.get("pull_request"):
+                        continue
+                    issue_label_names = _label_names_rest(iss)
+                    pri_key = github_priority_from_labels(issue_label_names, label)
+                    item = _normalize_item(iss)
+                    item["due"] = (iss.get("milestone") or {}).get("due_on")
+                    item["priority"] = pri_key
+                    created_dt = parse_dt(iss.get("created_at"))
+                    status_l = [n.lower() for n in issue_label_names]
+                    if any(s in status_l for s in status_in_progress):
+                        bucket_legacy["in_progress"].append(item)
+                        if created_dt and created_dt < rollover_cutoff:
+                            bucket_legacy["rollover"] += 1
+                    else:
+                        bucket_legacy["planned"].append(item)
+                        if created_dt and created_dt < rollover_cutoff:
+                            bucket_legacy["rollover"] += 1
+                if len(batch) < 100:
+                    break
+                page += 1
+
+            page = 1
+            while True:
+                params = {"state": "closed", "since": week_str, "per_page": 100, "page": page}
+                if label:
+                    params["labels"] = label
+                r = requests.get(
+                    f"https://api.github.com/repos/{owner}/{repo}/issues",
+                    headers=gh_headers, timeout=30,
+                    params=params,
+                )
+                r.raise_for_status()
+                batch = r.json()
+                if not batch:
+                    break
+                for iss in batch:
+                    if iss.get("pull_request"):
+                        continue
+                    closed_dt  = parse_dt(iss.get("closed_at"))
+                    created_dt = parse_dt(iss.get("created_at"))
+                    if not (closed_dt and WEEK_START <= closed_dt <= NOW):
+                        continue
+                    issue_label_names = _label_names_rest(iss)
+                    pri_key = github_priority_from_labels(issue_label_names, label)
+                    item = _normalize_item(iss)
+                    cd = safe_round(days_between(created_dt, closed_dt)) if created_dt else None
+                    item["cycle_days"] = cd
+                    item["priority"] = pri_key
+                    bucket_legacy["completed"].append(item)
+                    pd = bucket_legacy["pri_done"][pri_key]
+                    pd["tasks"].append(item["title"])
+                    if cd is not None:
+                        pd["cts"].append(cd)
+                if len(batch) < 100:
+                    break
+                page += 1
+        else:
+            print("   ⚠️  Configuração GitHub (progresso sprint) incompleta — defina OWNER + REPO ou PROJECT_NUMBER")
+            return {
+                **_base_error,
+                "error": (
+                    "Token OK, mas falta escopo do Project: defina GITHUB_PRODUCT_OWNER (org ou user) e "
+                    "GITHUB_PRODUCT_PROJECT_NUMBER (Modo A, Project v2) — ou OWNER + GITHUB_PRODUCT_REPO (Modo B). "
+                    "Os secrets do GitHub Actions precisam ter os mesmos nomes e o workflow precisa rodar de novo."
+                ),
+                **_empty_pp_extras(),
+            }
+
+    except Exception as exc:
+        msg = str(exc)
+        print(f"   ⚠️  Erro ao buscar dados do GitHub (board/sprint): {msg}")
+        if "Resource not accessible by personal access token" in msg:
+            msg += (
+                " — Conceda ao PAT leitura de Projects da organização (fine-grained: Organization → Projects → Read "
+                "e autorize na org; SSO se exigido). Classic: escopo read:project."
+            )
+        return {**_base_error, "error": msg, **_empty_pp_extras()}
+
+    if use_sprint_mode:
+        cur_slice = _finalize_pp_slice(
+            bucket_cur["planned"], bucket_cur["in_progress"], bucket_cur["completed"],
+            bucket_cur["rollover"], bucket_cur["pri_done"],
+        )
+        prev_block = None
+        if bucket_prev:
+            prev_block = _finalize_pp_slice(
+                bucket_prev["planned"], bucket_prev["in_progress"], bucket_prev["completed"],
+                bucket_prev["rollover"], bucket_prev["pri_done"],
+            )
+        pc, pic, cc = cur_slice["planned"]["count"], cur_slice["in_progress"]["count"], cur_slice["completed"]["count"]
+        print(f"   GitHub sprint atual: {pc} planejadas | {pic} em execução | {cc} concluídas | rollover {cur_slice['rollover']}")
+        if prev_block:
+            print(f"   GitHub sprint anterior: {prev_block['planned']['count']} p | {prev_block['in_progress']['count']} ex | {prev_block['completed']['count']} ok")
+        out = {
+            "source": "github",
+            "sprint": {"current": sprint_current, "previous": sprint_previous or None},
+            **cur_slice,
+            "previous_sprint": prev_block,
+        }
+        return out
+
+    leg = _finalize_pp_slice(
+        bucket_legacy["planned"], bucket_legacy["in_progress"], bucket_legacy["completed"],
+        bucket_legacy["rollover"], bucket_legacy["pri_done"],
+    )
+    print(
+        f"   GitHub board: {leg['planned']['count']} planejadas | {leg['in_progress']['count']} em execução | "
+        f"{leg['completed']['count']} concluídas | rollover {leg['rollover']}"
+    )
+    return {
+        "source": "github",
+        "sprint": {"current": None, "previous": None},
+        "previous_sprint": None,
+        **leg,
+    }
+
+
+def build_trend_weeks(snapshots, week_label):
+    """Eixo temporal (rótulos de semana) para os mini-gráficos de OKR no dashboard."""
+    rows = []
+    for s in snapshots[-5:]:
+        wl = (s or {}).get("week_label", "") or ""
+        rows.append({"week": wl})
+    rows.append({"week": week_label})
+    return rows
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
@@ -394,8 +1125,10 @@ def main():
     print("🤖 Gerando insights com Claude...")
     insights = generate_insights(current, previous)
 
+    print("🐙 Buscando progresso do projeto no GitHub…")
+    product_progress = build_product_progress()
+
     snapshots = load_snapshots()
-    # Find previous snapshot for trend chart
     prev_snapshot = snapshots[-1] if snapshots else previous
 
     week_label = f"Semana {NOW.isocalendar()[1]} · {NOW.strftime('%B %Y').capitalize()}"
@@ -406,8 +1139,8 @@ def main():
         "current": current,
         "previous": prev_snapshot.get("current", previous) if isinstance(prev_snapshot, dict) else previous,
         "insights": insights,
-        "trend": [trend_row_from_snapshot(s) for s in snapshots[-5:]]
-        + [trend_row_current(week_label, current)],
+        "product_progress": product_progress,
+        "trend": build_trend_weeks(snapshots, week_label),
     }
 
     # Save snapshot
@@ -490,7 +1223,7 @@ def fetch_plane_okr():
         return None
 
     try:
-        for pid in PROJECT_IDS:
+        for pid in _project_ids():
             try:
                 cycle = plane_get(f"projects/{pid}/cycles/{cycle_id}/")
                 issues = plane_get(f"projects/{pid}/cycles/{cycle_id}/cycle-issues/")
@@ -593,6 +1326,9 @@ def main():
     print("🤖 Gerando insights com Claude...")
     insights = generate_insights(current, previous)
 
+    print("🐙 Buscando progresso do projeto no GitHub…")
+    product_progress = build_product_progress()
+
     snapshots = load_snapshots()
     prev_snapshot = snapshots[-1] if snapshots else previous
     week_label = f"Semana {NOW.isocalendar()[1]} · {NOW.strftime('%B %Y').capitalize()}"
@@ -604,8 +1340,8 @@ def main():
         "previous": prev_snapshot.get("current", previous) if isinstance(prev_snapshot, dict) else previous,
         "insights": insights,
         "okr": okr_block,
-        "trend": [trend_row_from_snapshot(s) for s in snapshots[-5:]]
-        + [trend_row_current(week_label, current)],
+        "product_progress": product_progress,
+        "trend": build_trend_weeks(snapshots, week_label),
     }
 
     snapshots.append({"week_label": week_label, "current": current})
@@ -620,5 +1356,28 @@ def main():
     print(f"   Fluxo semana: {current.get('created_week', '?')} criadas, {current.get('completed_week', '?')} concluídas, saldo {current.get('balance_week', '?')}")
 
 
+def main_product_progress_only():
+    """Atualiza apenas product_progress em data/latest.json (só precisa de GITHUB_PRODUCT_* no .env)."""
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    os.chdir(repo_root)
+    path = os.path.join(repo_root, "data", "latest.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except FileNotFoundError:
+        data = {}
+    print("🐙 Atualizando apenas product_progress (GitHub)…")
+    data["product_progress"] = build_product_progress()
+    data["generated_at"] = NOW.isoformat()
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, default=str, ensure_ascii=False)
+    print(f"✅ {path} — campo product_progress atualizado")
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    if "--product-only" in sys.argv:
+        main_product_progress_only()
+    else:
+        main()

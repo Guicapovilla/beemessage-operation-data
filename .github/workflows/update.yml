@@ -27,17 +27,39 @@ jobs:
       - name: Instalar dependências
         run: pip install -r requirements.txt
 
+      # Sprint (Project v2): GITHUB_PRODUCT_SPRINT_FIELD_NAME, GITHUB_PRODUCT_SPRINT_CURRENT, GITHUB_PRODUCT_SPRINT_PREVIOUS
+      # Modo A (Project v2): GITHUB_PRODUCT_LABEL é ignorado (board inteiro). Modo B: label filtra issues no repo.
+      # GITHUB_PRODUCT_SPRINT_AUTO=0 desliga detecção automática de sprint.
       - name: Gerar dados
         env:
           PLANE_API_TOKEN: ${{ secrets.PLANE_API_TOKEN }}
           PLANE_WORKSPACE_SLUG: ${{ secrets.PLANE_WORKSPACE_SLUG }}
           PLANE_PROJECT_IDS: ${{ secrets.PLANE_PROJECT_IDS }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
+          ANTHROPIC_MAX_TOKENS: ${{ secrets.ANTHROPIC_MAX_TOKENS }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           BASELINE_MRR: ${{ secrets.BASELINE_MRR }}
           API_IMPLEMENTATIONS_COUNT: ${{ secrets.API_IMPLEMENTATIONS_COUNT }}
           PLANE_OKR_CYCLE_ID: ${{ secrets.PLANE_OKR_CYCLE_ID }}
           PLANE_OKR_MODULE_IDS: ${{ secrets.PLANE_OKR_MODULE_IDS }}
+          GITHUB_PRODUCT_TOKEN: ${{ secrets.GITHUB_PRODUCT_TOKEN }}
+          GITHUB_PRODUCT_OWNER: ${{ secrets.GITHUB_PRODUCT_OWNER }}
+          GITHUB_PRODUCT_REPO: ${{ secrets.GITHUB_PRODUCT_REPO }}
+          GITHUB_PRODUCT_PROJECT_NUMBER: ${{ secrets.GITHUB_PRODUCT_PROJECT_NUMBER }}
+          GITHUB_PRODUCT_OWNER_TYPE: ${{ secrets.GITHUB_PRODUCT_OWNER_TYPE }}
+          GITHUB_PRODUCT_LABEL: ${{ secrets.GITHUB_PRODUCT_LABEL }}
+          GITHUB_PRODUCT_STATUS_PLANNED: ${{ secrets.GITHUB_PRODUCT_STATUS_PLANNED }}
+          GITHUB_PRODUCT_STATUS_IN_PROGRESS: ${{ secrets.GITHUB_PRODUCT_STATUS_IN_PROGRESS }}
+          GITHUB_PRODUCT_STATUS_DONE: ${{ secrets.GITHUB_PRODUCT_STATUS_DONE }}
+          GITHUB_PRODUCT_PRIORITY_URGENTE: ${{ secrets.GITHUB_PRODUCT_PRIORITY_URGENTE }}
+          GITHUB_PRODUCT_PRIORITY_ALTA: ${{ secrets.GITHUB_PRODUCT_PRIORITY_ALTA }}
+          GITHUB_PRODUCT_PRIORITY_MEDIA: ${{ secrets.GITHUB_PRODUCT_PRIORITY_MEDIA }}
+          GITHUB_PRODUCT_PRIORITY_BAIXA: ${{ secrets.GITHUB_PRODUCT_PRIORITY_BAIXA }}
+          GITHUB_PRODUCT_SPRINT_FIELD_NAME: ${{ secrets.GITHUB_PRODUCT_SPRINT_FIELD_NAME }}
+          GITHUB_PRODUCT_SPRINT_CURRENT: ${{ secrets.GITHUB_PRODUCT_SPRINT_CURRENT }}
+          GITHUB_PRODUCT_SPRINT_PREVIOUS: ${{ secrets.GITHUB_PRODUCT_SPRINT_PREVIOUS }}
+          GITHUB_PRODUCT_SPRINT_AUTO: ${{ secrets.GITHUB_PRODUCT_SPRINT_AUTO }}
         run: python scripts/fetch_metrics.py
 
       - name: Commit e push
