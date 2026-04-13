@@ -152,7 +152,7 @@ def fetch_all_issues():
             if not batch:
                 break
             issues.extend(batch)
-            if len(batch) < 100:
+            if len(batch) < 100 or page >= 20:
                 break
             page += 1
     return issues
