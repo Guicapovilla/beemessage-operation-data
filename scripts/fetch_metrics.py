@@ -146,7 +146,9 @@ def fetch_all_issues():
     for pid in _project_ids():
         page = 1
         while True:
+            print(f"   Buscando página {page}...", flush=True)
             batch = plane_get(f"projects/{pid}/issues/", {"per_page": 100, "page": page, "expand": "state,assignees,labels"})
+            print(f"   Página {page}: {len(batch) if batch else 0} issues", flush=True)
             if not batch:
                 break
             issues.extend(batch)
