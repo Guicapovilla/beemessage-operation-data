@@ -65,16 +65,7 @@ PREV_WEEK_START= WEEK_START - timedelta(days=7)
 def plane_get(path, params=None):
     url = f"{PLANE_BASE}/workspaces/{_plane_slug()}/{path}"
     for attempt in range(5):
-        try:
-            r = requests.get(url, headers=_headers_plane(), params=params or {}, timeout=30)
-        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-            if attempt < 4:
-                wait = min(10 * (2 ** attempt), 120)
-                print(f"   ⏱️  Plane timeout/conexão (tentativa {attempt+1}/5) — aguardando {wait}s...")
-                time.sleep(wait)
-                continue
-            else:
-                raise TimeoutError(f"Plane API falhou após {attempt+1} tentativas: {e}")
+        r = requests.get(url, headers=_headers_plane(), params=params or {})
         if r.status_code == 429 and attempt < 4:
             raw = r.headers.get("Retry-After", "45")
             try:
@@ -364,33 +355,13 @@ Gere um JSON com esta estrutura exata (sem markdown, só JSON puro):
 
     _m, _mt = _anthropic_model(), _anthropic_max_tokens()
     print(f"   → API Anthropic: modelo {_m}, max_tokens={_mt}")
-    max_retries = 3
-    for attempt in range(max_retries):
-        try:
-            resp = requests.post(
-                "https://api.anthropic.com/v1/messages",
-                headers=_anthropic_headers(),
-                json={"model": _m, "max_tokens": _mt,
-                      "messages": [{"role": "user", "content": prompt}]},
-                timeout=60
-            )
-            resp.raise_for_status()
-            break
-        except requests.exceptions.Timeout:
-            if attempt < max_retries - 1:
-                wait = 10 * (2 ** attempt)
-                print(f"   ⏱️  Claude API timeout (tentativa {attempt+1}/{max_retries}) — aguardando {wait}s...")
-                time.sleep(wait)
-            else:
-                raise TimeoutError("Claude API não respondeu após 3 tentativas (60s cada)")
-        except requests.exceptions.RequestException as e:
-            if attempt < max_retries - 1:
-                wait = 10 * (2 ** attempt)
-                print(f"   ⚠️  Claude API erro (tentativa {attempt+1}/{max_retries}): {e} — aguardando {wait}s...")
-                time.sleep(wait)
-            else:
-                raise
-    
+    resp = requests.post(
+        "https://api.anthropic.com/v1/messages",
+        headers=_anthropic_headers(),
+        json={"model": _m, "max_tokens": _mt,
+              "messages": [{"role": "user", "content": prompt}]}
+    )
+    resp.raise_for_status()
     text = resp.json()["content"][0]["text"].strip()
     # Strip markdown fences if present
     if text.startswith("```"):
