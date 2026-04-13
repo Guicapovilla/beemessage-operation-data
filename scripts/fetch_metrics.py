@@ -11,6 +11,28 @@ import math
 import time
 import unicodedata
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+class ForceHTTP1Adapter(HTTPAdapter):
+    def send(self, request, **kwargs):
+        kwargs.setdefault("timeout", (10, 30))
+        return super().send(request, **kwargs)
+
+    def init_poolmanager(self, *args, **kwargs):
+        kwargs["socket_options"] = []
+        super().init_poolmanager(*args, **kwargs)
+
+_plane_session_obj = None
+def _plane_session():
+    global _plane_session_obj
+    if _plane_session_obj is None:
+        s = requests.Session()
+        adapter = ForceHTTP1Adapter()
+        s.mount("https://api.plane.so", adapter)
+        _plane_session_obj = s
+    return _plane_session_obj
+
 from datetime import date, datetime, timedelta, timezone
 from collections import defaultdict
 
@@ -66,7 +88,7 @@ def plane_get(path, params=None):
     url = f"{PLANE_BASE}/workspaces/{_plane_slug()}/{path}"
     for attempt in range(5):
         try:
-            r = requests.get(url, headers=_headers_plane(), params=params or {}, timeout=(10, 30))
+            r = _plane_session().get(url, headers=_headers_plane(), params=params or {}, timeout=(10, 30))
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
             if attempt < 4:
                 wait = min(10 * (2 ** attempt), 120)
