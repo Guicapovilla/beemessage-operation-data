@@ -62,7 +62,7 @@ jobs:
           SPRINT_CURRENT_GITHUB_PRODUCT: ${{ secrets.SPRINT_CURRENT_GITHUB_PRODUCT }}
           SPRINT_PREVIOUS_GITHUB_PRODUCT: ${{ secrets.SPRINT_PREVIOUS_GITHUB_PRODUCT }}
           SPRINT_AUTO_GITHUB_PRODUCT: ${{ secrets.SPRINT_AUTO_GITHUB_PRODUCT }}
-        run: python scripts/fetch_metrics.py
+        run: python scripts/fetch_metrics.py --product-only
 
       - name: Commit e push
         run: |
