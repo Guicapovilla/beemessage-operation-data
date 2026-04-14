@@ -54,24 +54,48 @@
     ]
   },
   "okr": {
-    "insight": "Conecte o Stripe (STRIPE_SECRET_KEY) e o Plane OKR (PLANE_OKR_CYCLE_ID) para habilitar análise automática de progresso e projeção de atingimento de metas com dados reais.",
+    "insight": "KR1 em 30.2% — no caminho certo para +30%. KR2 em 0.0%: abordagem ativa dos clientes Pro (2.18pp/semana). KR3: 6/10 (0.36/semana necessários). Semana 2 do trimestre.",
+    "kr1_trend": [
+      30.2
+    ],
+    "kr2_trend": [
+      0.0
+    ],
+    "kr3_trend": [
+      6
+    ],
     "key_results": [
       {
         "label": "KR1 · Aumentar faturamento da base +30%",
         "icon": "📈",
         "unit": "%",
-        "current": 14,
+        "current": 30.2,
         "target": 30,
         "delta": null,
         "details": [
           {
-            "label": "MRR atual",
-            "value": "— (aguardando Stripe)",
-            "color": "#4a4f6a"
+            "label": "Ticket médio atual",
+            "value": "R$276.76",
+            "color": "#e8eaf0"
+          },
+          {
+            "label": "Ticket base (01/abr)",
+            "value": "R$212.53",
+            "color": "#7b8099"
+          },
+          {
+            "label": "MRR total",
+            "value": "R$19,926.41",
+            "color": "#e8eaf0"
+          },
+          {
+            "label": "Clientes ativos",
+            "value": "72",
+            "color": "#7b8099"
           },
           {
             "label": "Crescimento acumulado",
-            "value": "14%",
+            "value": "30.2%",
             "color": "#f5a623"
           },
           {
@@ -81,7 +105,7 @@
           },
           {
             "label": "Ritmo necessário",
-            "value": "~5.3pp / semana",
+            "value": "~-0.02pp / semana",
             "color": "#7b8099"
           }
         ]
@@ -90,19 +114,24 @@
         "label": "KR2 · Converter 24% dos clientes Pro → Enterprise",
         "icon": "🚀",
         "unit": "%",
-        "current": 9,
+        "current": 0.0,
         "target": 24,
         "delta": null,
         "details": [
           {
             "label": "Clientes Pro ativos",
-            "value": "— (aguardando Stripe)",
-            "color": "#4a4f6a"
+            "value": "49",
+            "color": "#e8eaf0"
           },
           {
             "label": "Convertidos para Enterprise",
-            "value": "9%",
+            "value": "0.0%",
             "color": "#f5a623"
+          },
+          {
+            "label": "Conversões no trimestre",
+            "value": "0",
+            "color": "#e8eaf0"
           },
           {
             "label": "Meta trimestral",
@@ -111,7 +140,7 @@
           },
           {
             "label": "Ritmo necessário",
-            "value": "~3.75pp / semana",
+            "value": "~2.18pp / semana",
             "color": "#7b8099"
           }
         ]
@@ -131,7 +160,7 @@
           },
           {
             "label": "Em andamento",
-            "value": "—",
+            "value": "2",
             "color": "#f5a623"
           },
           {
@@ -141,7 +170,7 @@
           },
           {
             "label": "Ritmo necessário",
-            "value": "~0.6 / semana",
+            "value": "~0.36 / semana",
             "color": "#7b8099"
           }
         ]
@@ -674,5 +703,6 @@
     {
       "week": "Semana 16 · April 2026"
     }
-  ]
+  ],
+  "okr_updated_at": "2026-04-14T18:12:27.934065+00:00"
 }
