@@ -176,8 +176,15 @@ def classify(issues, states):
         created = parse_dt(iss.get("created_at"))
         completed = parse_dt(iss.get("completed_at"))
         due = parse_dt(iss.get("due_date"))
-        state_id = iss.get("state")
-        state = states.get(state_id, {})
+        raw_state = iss.get("state")
+        # When expand=state is used, the API returns state as a full dict
+        # instead of just the ID string — handle both cases
+        if isinstance(raw_state, dict):
+            state_id = raw_state.get("id")
+            state = raw_state
+        else:
+            state_id = raw_state
+            state = states.get(state_id, {})
         group = state.get("group", "")
 
         enriched = {
