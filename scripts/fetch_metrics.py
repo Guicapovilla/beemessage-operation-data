@@ -151,15 +151,21 @@ def _fetch_issues_paged(pid, extra_params):
     page   = 1
     base_params = {"per_page": 100, "expand": "state,assignees,labels"}
     base_params.update(extra_params)
+    filter_desc = ", ".join(f"{k}={v}" for k,v in extra_params.items()) or "sem filtro"
+    t0 = time.time()
     while True:
+        t_page = time.time()
         params = {**base_params, "page": page}
         batch  = plane_get(f"projects/{pid}/issues/", params)
+        elapsed_page = time.time() - t_page
         if not batch:
             break
         issues.extend(batch)
+        print(f"      p{page}: {len(batch)} issues ({elapsed_page:.1f}s) — total {len(issues)}", flush=True)
         if len(batch) < 100:
             break
         page += 1
+    print(f"      ✓ {len(issues)} issues [{filter_desc}] em {time.time()-t0:.1f}s", flush=True)
     return issues
 
 def fetch_all_issues():
@@ -179,45 +185,54 @@ def fetch_all_issues():
     # Grupos concluídos: só os das 2 semanas de interesse
     DONE_GROUPS   = "completed"
 
-    for pid in _project_ids():
-        print(f"   Projeto {pid[:8]}...", flush=True)
+    t_total = time.time()
+    for idx, pid in enumerate(_project_ids()):
+        proj_name = pid[:8]
+        print(f"\n   [{idx+1}/{len(_project_ids())}] Projeto {proj_name}...", flush=True)
         count_before = len(issues)
+        t_proj = time.time()
 
         # ── Query 1: issues abertas (qualquer data) ──────────────────────────
+        print(f"      → Query 1: abertas (group__in={OPEN_GROUPS})", flush=True)
         open_issues = _fetch_issues_paged(pid, {
             "group__in": OPEN_GROUPS,
         })
+        added_open = 0
         for iss in open_issues:
             uid = iss.get("id")
             if uid and uid not in seen:
                 seen.add(uid)
                 issues.append(iss)
+                added_open += 1
+        print(f"      → {added_open} abertas adicionadas", flush=True)
 
         # ── Query 2: issues concluídas nas últimas 2 semanas ─────────────────
-        # Filtra localmente pelo completed_at após buscar — a API pode não
-        # suportar filtro de data, mas o group__in já limita muito o volume
+        print(f"      → Query 2: concluídas recentes (group__in={DONE_GROUPS}, updated>={PREV_WEEK_START.strftime('%d/%m')})", flush=True)
         done_issues = _fetch_issues_paged(pid, {
             "group__in": DONE_GROUPS,
             "updated_at__gte": PREV_WEEK_START.strftime("%Y-%m-%dT%H:%M:%SZ"),
         })
+        added_done = 0
+        skipped = 0
         for iss in done_issues:
-            # Filtra localmente: só entra se completed_at >= PREV_WEEK_START
             completed_at = iss.get("completed_at")
             if completed_at:
                 try:
-                    from datetime import datetime, timezone
                     ct = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
                     if ct < PREV_WEEK_START:
-                        continue  # concluída antes da janela — ignora
+                        skipped += 1
+                        continue
                 except Exception:
-                    pass  # se não conseguir parsear, inclui por segurança
+                    pass
             uid = iss.get("id")
             if uid and uid not in seen:
                 seen.add(uid)
                 issues.append(iss)
+                added_done += 1
+        print(f"      → {added_done} concluídas adicionadas ({skipped} fora da janela ignoradas)", flush=True)
+        print(f"   ✓ Projeto {proj_name}: +{len(issues)-count_before} issues em {time.time()-t_proj:.1f}s (acumulado: {len(issues)})", flush=True)
 
-        print(f"   -> +{len(issues)-count_before} issues ({len(issues)} total)", flush=True)
-
+    print(f"\n   🏁 Total: {len(issues)} issues em {time.time()-t_total:.1f}s", flush=True)
     return issues
 
 def fetch_states():
@@ -1477,19 +1492,24 @@ def build_okr_block(stripe_data, plane_okr):
 
 
 def main():
-    print("🔄 Buscando issues do Plane...")
+    t0 = time.time()
+    print(f"🔄 Buscando issues do Plane... (janela: {WEEK_START.strftime('%d/%m')} – {WEEK_END.strftime('%d/%m/%Y')})")
+    print(f"   Projetos: {len(_project_ids())} | PREV_WEEK_START: {PREV_WEEK_START.strftime('%d/%m/%Y')}", flush=True)
     issues = fetch_all_issues()
+    print(f"\n   Buscando estados...", flush=True)
     states = fetch_states()
-    print(f"   {len(issues)} issues carregadas")
+    print(f"   {len(issues)} issues carregadas | {len(states)} estados | {time.time()-t0:.1f}s total", flush=True)
 
+    print("\n📊 Classificando e calculando métricas...", flush=True)
+    t1 = time.time()
     this_week, prev_week_issues, all_issues = classify(issues, states)
-
-    print("📊 Calculando métricas...")
+    print(f"   this_week={len(this_week)} | prev_week={len(prev_week_issues)} | all={len(all_issues)} | {time.time()-t1:.1f}s", flush=True)
     current  = compute_metrics(this_week, all_issues)
     previous = compute_metrics(prev_week_issues, all_issues)
     apply_week_flow_metrics(current, this_week, all_issues)
+    print(f"   Taxa atual: {current['rate']}% | Atrasos: {current['overdue']} | C.Time: {current['avg_cycle_time']}d", flush=True)
 
-    print("📦 Buscando dados do Stripe e OKR do Plane...")
+    print("\n📦 Buscando dados do Stripe e OKR do Plane...", flush=True)
     stripe_data = fetch_stripe_okr()
     plane_okr   = fetch_plane_okr()
     okr_block   = build_okr_block(stripe_data, plane_okr)
