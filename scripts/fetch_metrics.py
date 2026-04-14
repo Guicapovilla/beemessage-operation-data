@@ -79,7 +79,11 @@ def _anthropic_max_tokens():
         return 768
 
 NOW            = datetime.now(timezone.utc)
-WEEK_START     = (NOW - timedelta(days=NOW.weekday() + 1)).replace(hour=0, minute=0, second=0)  # segunda passada
+# Semana anterior completa: sempre segunda→domingo da semana passada
+# Ex: se hoje é terça 14/04, WEEK_START = seg 07/04, WEEK_END = dom 13/04 23:59:59
+_days_since_monday = NOW.weekday()                                      # seg=0 … dom=6
+WEEK_END       = (NOW - timedelta(days=_days_since_monday + 1)).replace(hour=23, minute=59, second=59, microsecond=999999)
+WEEK_START     = (WEEK_END - timedelta(days=6)).replace(hour=0, minute=0, second=0, microsecond=0)
 PREV_WEEK_START= WEEK_START - timedelta(days=7)
 
 
@@ -177,8 +181,7 @@ def classify(issues, states):
         completed = parse_dt(iss.get("completed_at"))
         due = parse_dt(iss.get("due_date"))
         raw_state = iss.get("state")
-        # When expand=state is used, the API returns state as a full dict
-        # instead of just the ID string — handle both cases
+        # Quando expand=state é usado, a API retorna state como dict completo
         if isinstance(raw_state, dict):
             state_id = raw_state.get("id")
             state = raw_state
@@ -211,7 +214,7 @@ def classify(issues, states):
                      if iss.get("label_details") else "Sem área",
         }
 
-        if created and created >= WEEK_START:
+        if created and WEEK_START <= created <= WEEK_END:
             this_week.append(enriched)
         elif created and created >= PREV_WEEK_START:
             prev_week.append(enriched)
@@ -453,7 +456,7 @@ def apply_week_flow_metrics(current, this_week, all_issues):
     completed_week = sum(
         1
         for i in all_issues
-        if i.get("_completed") and WEEK_START <= i["_completed"] <= NOW
+        if i.get("_completed") and WEEK_START <= i["_completed"] <= WEEK_END
     )
     current["created_week"] = created_week
     current["completed_week"] = completed_week
@@ -589,7 +592,7 @@ def _route_item_to_bucket(
             if cd is not None:
                 pri_done[pri_key]["cts"].append(cd)
             return True
-        if closed_dt and WEEK_START <= closed_dt <= NOW:
+        if closed_dt and WEEK_START <= closed_dt <= WEEK_END:
             cd = safe_round(days_between(created_dt, closed_dt)) if created_dt else None
             item = {**item, "cycle_days": cd}
             bucket["completed"].append(item)
@@ -1081,7 +1084,7 @@ def build_product_progress():
                         continue
                     closed_dt  = parse_dt(iss.get("closed_at"))
                     created_dt = parse_dt(iss.get("created_at"))
-                    if not (closed_dt and WEEK_START <= closed_dt <= NOW):
+                    if not (closed_dt and WEEK_START <= closed_dt <= WEEK_END):
                         continue
                     issue_label_names = _label_names_rest(iss)
                     pri_key = github_priority_from_labels(issue_label_names, label)
