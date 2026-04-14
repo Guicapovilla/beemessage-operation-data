@@ -145,20 +145,79 @@ PRIORITY_KEYS = ["urgente", "alta", "media", "baixa", "sem"]
 
 
 # ── Fetch all issues ──────────────────────────────────────────────────────────
-def fetch_all_issues():
+def _fetch_issues_paged(pid, extra_params):
+    """Busca todas as páginas de issues de um projeto com os filtros dados."""
     issues = []
+    page   = 1
+    base_params = {"per_page": 100, "expand": "state,assignees,labels"}
+    base_params.update(extra_params)
+    while True:
+        params = {**base_params, "page": page}
+        batch  = plane_get(f"projects/{pid}/issues/", params)
+        if not batch:
+            break
+        issues.extend(batch)
+        if len(batch) < 100:
+            break
+        page += 1
+    return issues
+
+def fetch_all_issues():
+    """
+    Busca apenas issues relevantes — igual ao Apps Script do Sheets:
+      Query 1: issues NÃO concluídas (backlog + started + unstarted)
+      Query 2: issues concluídas (completed) — só das 2 semanas analisadas
+
+    A API do Plane suporta filtro por group via parâmetro state__group__in.
+    Isso evita varrer o histórico completo de issues antigas concluídas.
+    """
+    seen   = set()
+    issues = []
+
+    # Grupos ativos: tudo que não é concluído nem cancelado
+    OPEN_GROUPS   = "backlog,unstarted,started"
+    # Grupos concluídos: só os das 2 semanas de interesse
+    DONE_GROUPS   = "completed"
+
     for pid in _project_ids():
-        page = 1
-        while True:
-            print(f"   Buscando página {page}...", flush=True)
-            batch = plane_get(f"projects/{pid}/issues/", {"per_page": 100, "page": page, "expand": "state,assignees,labels"})
-            print(f"   Página {page}: {len(batch) if batch else 0} issues", flush=True)
-            if not batch:
-                break
-            issues.extend(batch)
-            if len(batch) < 100:
-                break
-            page += 1
+        print(f"   Projeto {pid[:8]}...", flush=True)
+        count_before = len(issues)
+
+        # ── Query 1: issues abertas (qualquer data) ──────────────────────────
+        open_issues = _fetch_issues_paged(pid, {
+            "group__in": OPEN_GROUPS,
+        })
+        for iss in open_issues:
+            uid = iss.get("id")
+            if uid and uid not in seen:
+                seen.add(uid)
+                issues.append(iss)
+
+        # ── Query 2: issues concluídas nas últimas 2 semanas ─────────────────
+        # Filtra localmente pelo completed_at após buscar — a API pode não
+        # suportar filtro de data, mas o group__in já limita muito o volume
+        done_issues = _fetch_issues_paged(pid, {
+            "group__in": DONE_GROUPS,
+            "updated_at__gte": PREV_WEEK_START.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        })
+        for iss in done_issues:
+            # Filtra localmente: só entra se completed_at >= PREV_WEEK_START
+            completed_at = iss.get("completed_at")
+            if completed_at:
+                try:
+                    from datetime import datetime, timezone
+                    ct = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
+                    if ct < PREV_WEEK_START:
+                        continue  # concluída antes da janela — ignora
+                except Exception:
+                    pass  # se não conseguir parsear, inclui por segurança
+            uid = iss.get("id")
+            if uid and uid not in seen:
+                seen.add(uid)
+                issues.append(iss)
+
+        print(f"   -> +{len(issues)-count_before} issues ({len(issues)} total)", flush=True)
+
     return issues
 
 def fetch_states():
@@ -458,19 +517,48 @@ Gere um JSON com esta estrutura exata (sem markdown, só JSON puro):
 
 
 # ── Load / save snapshot ──────────────────────────────────────────────────────
-SNAPSHOT_PATH = "data/snapshots.json"
+SNAPSHOT_PATH  = "data/snapshots.json"   # índice leve (week_label + chave do arquivo)
+WEEKS_DIR      = "data/weeks"            # um JSON completo por semana
+
+def _week_key():
+    """Chave única da semana: ex. 2026-W15 (ISO week da segunda-feira da semana analisada)."""
+    iso = WEEK_START.isocalendar()
+    return f"{iso[0]}-W{iso[1]:02d}"
+
+def _week_file(key=None):
+    k = key or _week_key()
+    return os.path.join(WEEKS_DIR, f"{k}.json")
 
 def load_snapshots():
+    """Carrega o índice de semanas disponíveis."""
     try:
         with open(SNAPSHOT_PATH) as f:
             return json.load(f)
     except FileNotFoundError:
         return []
 
+def save_week(output, key=None):
+    """Salva o output completo da semana em data/weeks/YYYY-WNN.json."""
+    os.makedirs(WEEKS_DIR, exist_ok=True)
+    path = _week_file(key)
+    with open(path, "w") as f:
+        json.dump(output, f, indent=2, default=str, ensure_ascii=False)
+    return path
+
 def save_snapshots(snaps):
+    """Salva o índice com todas as semanas disponíveis (sem limite)."""
     os.makedirs("data", exist_ok=True)
     with open(SNAPSHOT_PATH, "w") as f:
-        json.dump(snaps[-12:], f, indent=2, default=str)  # keep last 12 weeks
+        json.dump(snaps, f, indent=2, default=str)
+
+def load_week(key):
+    """Carrega o output completo de uma semana específica pelo key (ex: 2026-W15)."""
+    path = _week_file(key)
+    try:
+        with open(path) as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return None
 
 
 def apply_week_flow_metrics(current, this_week, all_issues):
@@ -1388,9 +1476,6 @@ def build_okr_block(stripe_data, plane_okr):
     }
 
 
-# Patch main() to include OKR data
-_original_main = main
-
 def main():
     print("🔄 Buscando issues do Plane...")
     issues = fetch_all_issues()
@@ -1415,31 +1500,53 @@ def main():
     print("🐙 Buscando progresso do projeto no GitHub…")
     product_progress = build_product_progress()
 
-    snapshots = load_snapshots()
-    prev_snapshot = snapshots[-1] if snapshots else previous
-    week_label = f"Semana {NOW.isocalendar()[1]} · {NOW.strftime('%B %Y').capitalize()}"
+    # ── Índice e chave da semana ──────────────────────────────────────────────
+    week_key   = _week_key()                                          # ex: 2026-W15
+    week_label = f"Semana {WEEK_START.isocalendar()[1]} · {WEEK_START.strftime('%B %Y').capitalize()}"
+    week_range = f"{WEEK_START.strftime('%d/%m')} – {WEEK_END.strftime('%d/%m/%Y')}"
+
+    # Carrega índice e resolve "previous" como a semana anterior salva
+    snapshots     = load_snapshots()
+    prev_entry    = snapshots[-1] if snapshots else None
+    prev_week_out = load_week(prev_entry["key"]) if prev_entry else None
+    prev_current  = (prev_week_out or {}).get("current", previous)
 
     output = {
-        "generated_at": NOW.isoformat(),
-        "week_label": week_label,
-        "current": current,
-        "previous": prev_snapshot.get("current", previous) if isinstance(prev_snapshot, dict) else previous,
-        "insights": insights,
-        "okr": okr_block,
+        "generated_at":   NOW.isoformat(),
+        "week_key":        week_key,
+        "week_label":      week_label,
+        "week_range":      week_range,
+        "current":         current,
+        "previous":        prev_current,
+        "insights":        insights,
+        "okr":             okr_block,
         "product_progress": product_progress,
-        "trend": build_trend_weeks(snapshots, week_label),
+        "trend":           build_trend_weeks(snapshots, week_label),
     }
 
-    snapshots.append({"week_label": week_label, "current": current})
+    # ── Salva semana individual em data/weeks/YYYY-WNN.json ───────────────────
+    week_path = save_week(output, week_key)
+    print(f"   💾 Semana salva em {week_path}")
+
+    # ── Atualiza índice (upsert pela chave) ───────────────────────────────────
+    idx_entry = {"key": week_key, "label": week_label, "range": week_range,
+                 "rate": current["rate"], "generated_at": NOW.isoformat()}
+    existing_keys = [s["key"] for s in snapshots]
+    if week_key in existing_keys:
+        snapshots[existing_keys.index(week_key)] = idx_entry  # re-run da mesma semana
+    else:
+        snapshots.append(idx_entry)
     save_snapshots(snapshots)
 
+    # ── latest.json aponta para a semana atual (compatibilidade com dashboard) ─
     os.makedirs("data", exist_ok=True)
     with open("data/latest.json", "w") as f:
         json.dump(output, f, indent=2, default=str, ensure_ascii=False)
 
-    print(f"✅ data/latest.json salvo — semana {week_label}")
+    print(f"✅ data/latest.json salvo — {week_label} ({week_range})")
     print(f"   Taxa: {current['rate']}% | C.Time: {current['avg_cycle_time']}d | Atrasos: {current['overdue']}")
-    print(f"   Fluxo semana: {current.get('created_week', '?')} criadas, {current.get('completed_week', '?')} concluídas, saldo {current.get('balance_week', '?')}")
+    print(f"   Fluxo semana: {current.get('created_week','?')} criadas, {current.get('completed_week','?')} concluídas, saldo {current.get('balance_week','?')}")
+    print(f"   Histórico: {len(snapshots)} semana(s) disponível(is) em data/weeks/")
 
 
 def main_product_progress_only():
