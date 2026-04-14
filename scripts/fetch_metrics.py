@@ -145,11 +145,17 @@ PRIORITY_KEYS = ["urgente", "alta", "media", "baixa", "sem"]
 
 
 # ── Fetch all issues ──────────────────────────────────────────────────────────
-def _fetch_issues_paged(pid, extra_params):
-    """Busca todas as páginas de issues de um projeto com os filtros dados."""
+def _fetch_issues_paged(pid, extra_params, early_exit_cutoff=None):
+    """
+    Busca issues paginadas.
+    early_exit_cutoff: se definido (datetime), para quando uma página inteira
+    não tiver nenhuma issue atualizada após esse cutoff — assumindo ordenação
+    por updated_at desc (padrão da API do Plane).
+    """
     issues = []
     page   = 1
-    base_params = {"per_page": 100, "expand": "state,assignees,labels"}
+    base_params = {"per_page": 100, "expand": "state,assignees,labels",
+                   "order_by": "-updated_at"}   # mais recentes primeiro
     base_params.update(extra_params)
     filter_desc = ", ".join(f"{k}={v}" for k,v in extra_params.items()) or "sem filtro"
     t0 = time.time()
@@ -161,6 +167,26 @@ def _fetch_issues_paged(pid, extra_params):
         if not batch:
             break
         issues.extend(batch)
+
+        # Early exit: verifica se alguma issue desta página é recente o suficiente
+        if early_exit_cutoff:
+            page_has_recent = False
+            for iss in batch:
+                updated = iss.get("updated_at") or iss.get("created_at")
+                if updated:
+                    try:
+                        ut = datetime.fromisoformat(updated.replace("Z", "+00:00"))
+                        if ut >= early_exit_cutoff:
+                            page_has_recent = True
+                            break
+                    except Exception:
+                        page_has_recent = True  # não conseguiu parsear, continua
+                        break
+            if not page_has_recent:
+                print(f"      p{page}: {len(batch)} issues ({elapsed_page:.1f}s) — "
+                      f"nenhuma recente, parando early exit ✓", flush=True)
+                break
+
         print(f"      p{page}: {len(batch)} issues ({elapsed_page:.1f}s) — total {len(issues)}", flush=True)
         if len(batch) < 100:
             break
@@ -170,12 +196,14 @@ def _fetch_issues_paged(pid, extra_params):
 
 def _fetch_project_issues(pid, idx, total):
     """Busca todas as issues de um projeto (chamado em thread paralela)."""
-    import threading
     proj_name = pid[:8]
     t_proj = time.time()
     print(f"   [{idx+1}/{total}] Projeto {proj_name} — iniciando...", flush=True)
 
-    issues = _fetch_issues_paged(pid, {})
+    # Usa early exit: para quando página inteira for mais antiga que PREV_WEEK_START
+    # Issues abertas (never completed) sempre têm updated_at recente se ativas,
+    # mas issues muito antigas sem atividade ficam no fundo — early exit pega isso
+    issues = _fetch_issues_paged(pid, {}, early_exit_cutoff=PREV_WEEK_START)
 
     # Filtra localmente: descarta concluídas/canceladas antigas
     relevant = []
