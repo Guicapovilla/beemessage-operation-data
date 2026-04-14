@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-14T13:25:34.220878+00:00",
+  "generated_at": "2026-04-14T13:37:33.187224+00:00",
   "week_label": "Semana 16 · April 2026",
   "current": {
     "total": 0,
@@ -16,100 +16,41 @@
     "balance_week": 0
   },
   "previous": {
-    "total": 20,
+    "total": 0,
     "done": 0,
     "rate": 0,
     "avg_cycle_time": null,
     "overdue": 0,
     "chronic_rollover": 480,
-    "areas": [
-      {
-        "name": "Sem área",
-        "score": "D",
-        "total": 20,
-        "done": 0,
-        "rate": 0,
-        "overdue": 0,
-        "rollover": 480,
-        "backlog": 20,
-        "priority_breakdown": {
-          "urgente": {
-            "count": 0,
-            "avg_days": null,
-            "min_days": null,
-            "max_days": null,
-            "tasks": []
-          },
-          "alta": {
-            "count": 0,
-            "avg_days": null,
-            "min_days": null,
-            "max_days": null,
-            "tasks": []
-          },
-          "media": {
-            "count": 0,
-            "avg_days": null,
-            "min_days": null,
-            "max_days": null,
-            "tasks": []
-          },
-          "baixa": {
-            "count": 0,
-            "avg_days": null,
-            "min_days": null,
-            "max_days": null,
-            "tasks": []
-          },
-          "sem": {
-            "count": 0,
-            "avg_days": null,
-            "min_days": null,
-            "max_days": null,
-            "tasks": []
-          }
-        }
-      }
-    ],
-    "collaborators": [
-      {
-        "name": "daniel.violacosta",
-        "tasks": 20,
-        "done": 0,
-        "rate": 0,
-        "overdue": [],
-        "areas": [
-          "Sem área"
-        ],
-        "overloaded": false,
-        "chronic": false,
-        "severity": "ok"
-      }
-    ],
-    "overdue_tasks": []
+    "areas": [],
+    "collaborators": [],
+    "overdue_tasks": [],
+    "created_week": 0,
+    "completed_week": 0,
+    "balance_week": 0
   },
   "insights": {
-    "headline": "Semana estagnada com rollover crônico acumulado de 480 tarefas",
+    "headline": "Semana estagnada com rollover crônico persistente de 480 tasks.",
     "status": "negativo",
-    "summary": "A equipe mantém uma posição completamente estagnada: zero tarefas concluídas pela segunda semana consecutiva e um passivo de 480 tarefas em rollover crônico sem movimento. Não há progressão em nenhuma métrica e o cycle time permanece indisponível, sugerindo possível falta de rastreamento ou início de execução.",
+    "summary": "A equipe mantém taxa de conclusão em 0% pela segunda semana consecutiva, com 480 tasks em rollover crônico que não avançam. Não há novos atrasos registrados, mas a ausência total de progresso indica bloqueios sistêmicos que impedem entrega. O padrão de estagnação completa sugere problema estrutural, não flutuação normal.",
     "highlights": [
-      "Nenhum colaborador em estado crítico de sobrecarga individual identificado",
-      "Ausência de áreas com desempenho baixo (scores C ou D) documentadas"
+      "Nenhum novo atraso foi adicionado (delta +0 em tasks atrasadas)",
+      "Sem colaboradores críticos sobrecarregados identificados no sistema"
     ],
     "alerts": [
-      "CRÍTICO: Taxa de conclusão em 0% pela 2ª semana consecutiva - indica bloqueio sistêmico, falta de recursos, clareza de prioridades ou capacidade de execução. Ação: Investigação urgente de impedimentos e reavaliar escopo vs. capacidade do time.",
-      "CRÍTICO: Rollover crônico de 480 tarefas sem redução - backlog acumulado em nível insustentável. Ação: Sessão de priorização imediata e possível replanejamento trimestral.",
-      "ALERTA: Cycle time não disponível (None) - rastreamento ou visibilidade de execução comprometidos. Ação: Validar sistema de tracking e garantir que tarefas estão sendo logadas corretamente."
+      "CRÍTICO: Taxa de conclusão zerada por 2 semanas consecutivas. Causa provável: bloqueios não removidos, falta de clareza nas prioridades ou impedimentos técnicos não resolvidos. Ação: fazer stand-up de emergência segunda-feira para identificar bloqueios específicos.",
+      "CRÍTICO: Rollover crônico de 480 tasks estagnado. Causa provável: backlog não está sendo refinado, requisitos não estão claros ou capacidade comprometida. Ação: revisar backlog top 20 com product e validar se estão desempedidos.",
+      "RISCO: Falta de dados de cycle time (Noned) impede análise de produtividade real. Ação: validar configuração de rastreamento de tempo no sistema de gestão de tarefas."
     ],
-    "overload_analysis": "Nenhuma sobrecarga individual detectada nos dados, mas a estagnação coletiva (0% conclusão) sugere um problema estrutural ou de capacidade agregada: a demanda acumulada (480 tarefas em rollover) claramente excede a capacidade de execução semanal. Recomendação: Mapear capacidade real disponível vs. demanda para calibrar expectativas e considerar redimensionamento ou terceirização.",
+    "overload_analysis": "Nenhuma sobrecarga individual detectada pelo sistema, porém a estagnação global (0% conclusão) pode indicar: (1) distribuição de tarefas não reflete capacidade real, (2) bloqueios centralizados impedindo todo o time, ou (3) falta de visibilidade nas dependências. Recomendação: mapear dependências do backlog crônico e identificar se há um ou poucos colaboradores-chave que estão bloqueados.",
     "projections": [
-      "Risco extremamente alto de continuidade de estagnação para próxima semana caso não haja intervenção imediata",
-      "Sem ação corretiva, o rollover crônico pode ultrapassar 500+ tarefas, criando crise de entrega"
+      "Se não houver intervenção, próxima semana repetirá padrão de 0% conclusão e rollover crescente",
+      "Risco de desmotivação da equipe após 2 semanas de inatividade visível"
     ],
     "action_items": [
-      "URGENTE (até segunda): Reunião de diagnóstico com lideranças técnicas para identificar bloqueios específicos (recursos, dependências, clareza de requisitos) impedindo execução.",
-      "URGENTE (até segunda): Sessão de priorização com produto/negócio para reduzir backlog de 480 tarefas a um sprint realista (máx. 20-30% da capacidade semanal).",
-      "Esta semana: Auditoria do sistema de rastreamento - validar se tarefas estão sendo registradas e por que cycle time não está sendo calculado."
+      "SEGUNDA: Conduzir sessão de desbloqueio (30min) com tech lead + product para listar os 5 principais impedimentos das 480 tasks em rollover",
+      "SEGUNDA: Validar integridade dos dados de cycle time e taxa de conclusão no sistema (possível problema de rastreamento)",
+      "QUARTA: Apresentar plano de ação executivo com cronograma realista de retomada de conclusões para liderança sênior"
     ]
   },
   "okr": {
@@ -727,6 +668,9 @@
     }
   },
   "trend": [
+    {
+      "week": "Semana 16 · April 2026"
+    },
     {
       "week": "Semana 16 · April 2026"
     }
