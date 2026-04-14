@@ -333,6 +333,16 @@
     .grid2,.okr-cards,.i-cols{grid-template-columns:1fr}
     .imp-board{grid-template-columns:repeat(4,minmax(200px,1fr))}
   }
+  /* ── Seletor de semana ── */
+  .week-selector{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .week-select{font-family:inherit;font-size:12px;padding:5px 10px;border-radius:8px;border:.5px solid var(--border2);background:var(--surface2);color:var(--text);cursor:pointer;outline:none;max-width:220px}
+  .week-select:focus{border-color:rgba(96,165,250,.5)}
+  .week-select option{background:var(--surface2);color:var(--text)}
+  .week-nav{width:28px;height:28px;border:.5px solid var(--border2);border-radius:8px;background:var(--surface2);color:var(--muted);font-size:14px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:color .15s,background .15s}
+  .week-nav:hover{color:var(--text);background:var(--border)}
+  .week-nav:disabled{opacity:.3;cursor:default}
+  .week-live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 0 2px rgba(62,207,142,.25)}
+  .week-live-lbl{font-size:11px;color:var(--green);font-weight:600}
 </style>
 </head>
 <body>
@@ -343,6 +353,15 @@
       <p id="hdr-date">Carregando…</p>
     </div>
     <div class="hdr-right">
+      <div class="week-selector">
+        <button type="button" class="week-nav" id="week-prev" onclick="weekNav(-1)" title="Semana anterior" disabled>‹</button>
+        <select class="week-select" id="week-select" onchange="weekSelectChange()" title="Selecionar semana">
+          <option value="latest">Carregando…</option>
+        </select>
+        <button type="button" class="week-nav" id="week-next" onclick="weekNav(1)" title="Próxima semana" disabled>›</button>
+        <span class="week-live-dot" id="week-live-dot" style="display:none"></span>
+        <span class="week-live-lbl" id="week-live-lbl" style="display:none">Atual</span>
+      </div>
       <span id="status-pill" class="status-pill pill-neu">—</span>
       <span id="updated-at" class="updated">—</span>
     </div>
@@ -1496,16 +1515,114 @@ fetch('data/improvements.json?v='+Date.now())
   .then(d=>{_impRemote=d.improvements||[];mergeAndRender();})
   .catch(()=>{_impRemote=[];mergeAndRender();});
 
-// ── OPERAÇÕES ──────────────────────────────────────────────────────────────
-function loadDashboard(){
-  return fetch('data/latest.json?v='+Date.now())
+// ── OPERAÇÕES — sistema de semanas ─────────────────────────────────────────
+let _weeks   = [];   // índice de semanas [{key,label,range,rate}, ...]
+let _weekIdx = -1;   // índice atual em _weeks (-1 = latest)
+let _isLive  = true; // true = exibindo semana mais recente
+
+function _weekUrl(key){
+  if(!key||key==='latest') return 'data/latest.json?v='+Date.now();
+  return 'data/weeks/'+key+'.json?v='+Date.now();
+}
+
+function _buildWeekSelect(){
+  const sel=document.getElementById('week-select');
+  if(!sel)return;
+  sel.innerHTML='';
+  // Opções em ordem decrescente (mais recente primeiro)
+  const sorted=[..._weeks].reverse();
+  sorted.forEach((w,i)=>{
+    const opt=document.createElement('option');
+    opt.value=w.key;
+    const isLatest=(i===0);
+    opt.textContent=(isLatest?'▶ ':'')+(w.label||w.key)+(w.range?' · '+w.range:'')+(w.rate!=null?' · '+w.rate+'%':'');
+    sel.appendChild(opt);
+  });
+  // Seleciona a semana atual
+  if(_weekIdx>=0 && _weeks[_weekIdx]){
+    sel.value=_weeks[_weekIdx].key;
+  } else if(sorted.length>0){
+    sel.value=sorted[0].key;
+  }
+  // Navegação
+  const prevBtn=document.getElementById('week-prev');
+  const nextBtn=document.getElementById('week-next');
+  if(prevBtn)prevBtn.disabled=(_weekIdx<=0&&_weeks.length>0&&_weekIdx===_weeks.length-1)||_weeks.length<=1;
+  if(nextBtn)nextBtn.disabled=_isLive||_weeks.length<=1;
+  // Badge "Atual"
+  document.getElementById('week-live-dot').style.display=_isLive?'':'none';
+  document.getElementById('week-live-lbl').style.display=_isLive?'':'none';
+  // Atualiza prev/next corretamente
+  _updateNavButtons();
+}
+
+function _updateNavButtons(){
+  const prevBtn=document.getElementById('week-prev');
+  const nextBtn=document.getElementById('week-next');
+  // _weeks está em ordem crescente (mais antiga = index 0, mais recente = index length-1)
+  if(prevBtn)prevBtn.disabled=(_weekIdx<=0);
+  if(nextBtn)nextBtn.disabled=(_weekIdx>=_weeks.length-1||_isLive&&_weekIdx===_weeks.length-1);
+  document.getElementById('week-live-dot').style.display=_isLive?'':'none';
+  document.getElementById('week-live-lbl').style.display=_isLive?'':'none';
+}
+
+function weekSelectChange(){
+  const sel=document.getElementById('week-select');
+  const key=sel?sel.value:null;
+  if(!key)return;
+  const idx=_weeks.findIndex(w=>w.key===key);
+  _weekIdx=idx;
+  _isLive=(idx===_weeks.length-1);
+  _updateNavButtons();
+  _fetchAndRender(key);
+}
+
+function weekNav(dir){
+  // dir=-1 semana anterior, dir=+1 mais recente
+  const newIdx=_weekIdx+dir;
+  if(newIdx<0||newIdx>=_weeks.length)return;
+  _weekIdx=newIdx;
+  _isLive=(newIdx===_weeks.length-1);
+  const key=_weeks[newIdx].key;
+  const sel=document.getElementById('week-select');
+  if(sel)sel.value=key;
+  _updateNavButtons();
+  _fetchAndRender(key);
+}
+
+function _fetchAndRender(key){
+  const url=_weekUrl(key);
+  fetch(url)
     .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
     .then(d=>{renderOps(d);renderOKRs(d);renderCOO(d);renderProductProgress(d.product_progress);})
-    .catch(e=>{document.getElementById('tab-ops').innerHTML=`<p style="color:#f56565;padding:40px 0">Erro ao carregar dados: ${e.message}</p>`;});
+    .catch(e=>{document.getElementById('tab-ops').innerHTML=
+      `<p style="color:#f56565;padding:40px 0">Erro ao carregar semana: ${e.message}</p>`;});
 }
+
+function loadDashboard(){
+  // 1. Carrega índice de semanas
+  fetch('data/snapshots.json?v='+Date.now())
+    .then(r=>r.ok?r.json():[])
+    .catch(()=>[])
+    .then(weeks=>{
+      _weeks=Array.isArray(weeks)?weeks:[];
+      // Se não há índice ainda, cai no latest.json direto
+      if(_weeks.length===0){
+        _weekIdx=-1;_isLive=true;
+        document.getElementById('week-select').innerHTML='<option value="latest">Semana atual</option>';
+        _updateNavButtons();
+        return _fetchAndRender('latest');
+      }
+      _weekIdx=_weeks.length-1;  // mais recente
+      _isLive=true;
+      _buildWeekSelect();
+      return _fetchAndRender(_weeks[_weekIdx].key);
+    });
+}
+
 loadDashboard();
-// Polling: re-fetch a cada 5 minutos (útil quando o Action atualiza o JSON sem reload manual)
-setInterval(loadDashboard, 5*60*1000);
+// Polling: re-fetch a cada 5 minutos apenas se estiver na semana atual
+setInterval(()=>{if(_isLive)loadDashboard();}, 5*60*1000);
 </script>
 </body>
 </html>
