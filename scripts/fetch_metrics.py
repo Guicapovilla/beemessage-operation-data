@@ -74,9 +74,9 @@ def _anthropic_model():
 def _anthropic_max_tokens():
     raw = (os.environ.get("ANTHROPIC_MAX_TOKENS") or "").strip()
     try:
-        return max(256, min(4096, int(raw))) if raw else 768
+        return max(256, min(4096, int(raw))) if raw else 2048
     except ValueError:
-        return 768
+        return 2048
 
 NOW            = datetime.now(timezone.utc)
 # Semana anterior completa: sempre segunda→domingo da semana passada
@@ -425,13 +425,36 @@ Gere um JSON com esta estrutura exata (sem markdown, só JSON puro):
             else:
                 raise
     
-    text = resp.json()["content"][0]["text"].strip()
+    resp_json = resp.json()
+    # Detecta truncamento por max_tokens
+    stop_reason = resp_json.get("stop_reason", "")
+    if stop_reason == "max_tokens":
+        print("   ⚠️  Resposta do Claude truncada (max_tokens atingido) — retornando fallback")
+        return {
+            "headline": "Análise indisponível — resposta truncada",
+            "status": "neutro",
+            "summary": "O modelo atingiu o limite de tokens antes de completar o JSON. Aumente ANTHROPIC_MAX_TOKENS.",
+            "highlights": [], "alerts": [], "overload_analysis": "—",
+            "projections": [], "action_items": []
+        }
+
+    text = resp_json["content"][0]["text"].strip()
     # Strip markdown fences if present
     if text.startswith("```"):
         text = text.split("```")[1]
         if text.startswith("json"):
             text = text[4:]
-    return json.loads(text.strip())
+    try:
+        return json.loads(text.strip())
+    except json.JSONDecodeError as e:
+        print(f"   ⚠️  JSON inválido do Claude ({e}) — retornando fallback")
+        return {
+            "headline": "Análise indisponível — JSON inválido",
+            "status": "neutro",
+            "summary": "Não foi possível parsear a resposta do modelo.",
+            "highlights": [], "alerts": [], "overload_analysis": "—",
+            "projections": [], "action_items": []
+        }
 
 
 # ── Load / save snapshot ──────────────────────────────────────────────────────
