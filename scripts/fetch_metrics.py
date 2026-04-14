@@ -168,71 +168,82 @@ def _fetch_issues_paged(pid, extra_params):
     print(f"      ✓ {len(issues)} issues [{filter_desc}] em {time.time()-t0:.1f}s", flush=True)
     return issues
 
+def _fetch_project_issues(pid, idx, total):
+    """Busca todas as issues de um projeto (chamado em thread paralela)."""
+    import threading
+    proj_name = pid[:8]
+    t_proj = time.time()
+    print(f"   [{idx+1}/{total}] Projeto {proj_name} — iniciando...", flush=True)
+
+    issues = _fetch_issues_paged(pid, {})
+
+    # Filtra localmente: descarta concluídas/canceladas antigas
+    relevant = []
+    skipped  = 0
+    for iss in issues:
+        raw_state = iss.get("state")
+        group = raw_state.get("group", "") if isinstance(raw_state, dict) else ""
+        if group in ("completed", "cancelled"):
+            # Só mantém se foi concluída nas últimas 2 semanas
+            completed_at = iss.get("completed_at")
+            if not completed_at:
+                skipped += 1
+                continue
+            try:
+                ct = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
+                if ct < PREV_WEEK_START:
+                    skipped += 1
+                    continue
+            except Exception:
+                skipped += 1
+                continue
+        relevant.append(iss)
+
+    elapsed = time.time() - t_proj
+    print(f"   ✓ [{idx+1}/{total}] Projeto {proj_name}: {len(relevant)} relevantes "
+          f"({skipped} antigas descartadas) em {elapsed:.1f}s", flush=True)
+    return relevant
+
+
 def fetch_all_issues():
     """
-    Busca apenas issues relevantes — igual ao Apps Script do Sheets:
-      Query 1: issues NÃO concluídas (backlog + started + unstarted)
-      Query 2: issues concluídas (completed) — só das 2 semanas analisadas
-
-    A API do Plane suporta filtro por group via parâmetro state__group__in.
-    Isso evita varrer o histórico completo de issues antigas concluídas.
+    Busca issues dos 7 projetos em PARALELO (igual ao comportamento do Apps Script).
+    A API do Plane não suporta filtro por group/data, então filtramos localmente
+    após o fetch — mas com threads, todos os projetos rodam ao mesmo tempo.
     """
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+
+    project_ids = _project_ids()
+    total = len(project_ids)
+    t_total = time.time()
+    print(f"   Iniciando fetch paralelo de {total} projetos...", flush=True)
+
+    results = {}
+    with ThreadPoolExecutor(max_workers=min(total, 7)) as executor:
+        futures = {
+            executor.submit(_fetch_project_issues, pid, idx, total): pid
+            for idx, pid in enumerate(project_ids)
+        }
+        for future in as_completed(futures):
+            pid = futures[future]
+            try:
+                results[pid] = future.result()
+            except Exception as e:
+                print(f"   ⚠️  Erro no projeto {pid[:8]}: {e}", flush=True)
+                results[pid] = []
+
+    # Consolida mantendo ordem original e deduplicando
     seen   = set()
     issues = []
-
-    # Grupos ativos: tudo que não é concluído nem cancelado
-    OPEN_GROUPS   = "backlog,unstarted,started"
-    # Grupos concluídos: só os das 2 semanas de interesse
-    DONE_GROUPS   = "completed"
-
-    t_total = time.time()
-    for idx, pid in enumerate(_project_ids()):
-        proj_name = pid[:8]
-        print(f"\n   [{idx+1}/{len(_project_ids())}] Projeto {proj_name}...", flush=True)
-        count_before = len(issues)
-        t_proj = time.time()
-
-        # ── Query 1: issues abertas (qualquer data) ──────────────────────────
-        print(f"      → Query 1: abertas (group__in={OPEN_GROUPS})", flush=True)
-        open_issues = _fetch_issues_paged(pid, {
-            "group__in": OPEN_GROUPS,
-        })
-        added_open = 0
-        for iss in open_issues:
+    for pid in project_ids:
+        for iss in results.get(pid, []):
             uid = iss.get("id")
             if uid and uid not in seen:
                 seen.add(uid)
                 issues.append(iss)
-                added_open += 1
-        print(f"      → {added_open} abertas adicionadas", flush=True)
 
-        # ── Query 2: issues concluídas nas últimas 2 semanas ─────────────────
-        print(f"      → Query 2: concluídas recentes (group__in={DONE_GROUPS}, updated>={PREV_WEEK_START.strftime('%d/%m')})", flush=True)
-        done_issues = _fetch_issues_paged(pid, {
-            "group__in": DONE_GROUPS,
-            "updated_at__gte": PREV_WEEK_START.strftime("%Y-%m-%dT%H:%M:%SZ"),
-        })
-        added_done = 0
-        skipped = 0
-        for iss in done_issues:
-            completed_at = iss.get("completed_at")
-            if completed_at:
-                try:
-                    ct = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
-                    if ct < PREV_WEEK_START:
-                        skipped += 1
-                        continue
-                except Exception:
-                    pass
-            uid = iss.get("id")
-            if uid and uid not in seen:
-                seen.add(uid)
-                issues.append(iss)
-                added_done += 1
-        print(f"      → {added_done} concluídas adicionadas ({skipped} fora da janela ignoradas)", flush=True)
-        print(f"   ✓ Projeto {proj_name}: +{len(issues)-count_before} issues em {time.time()-t_proj:.1f}s (acumulado: {len(issues)})", flush=True)
-
-    print(f"\n   🏁 Total: {len(issues)} issues em {time.time()-t_total:.1f}s", flush=True)
+    print(f"\n   🏁 Total: {len(issues)} issues relevantes em {time.time()-t_total:.1f}s "
+          f"(paralelo, {total} projetos)", flush=True)
     return issues
 
 def fetch_states():
