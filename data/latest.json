@@ -54,48 +54,52 @@
     ]
   },
   "okr": {
-    "insight": "KR1 em 30.2% — no caminho certo para +30%. KR2 em 0.0%: abordagem ativa dos clientes Pro (2.18pp/semana). KR3: 6/10 (0.36/semana necessários). Semana 2 do trimestre.",
+    "insight": "KR1 em 910.0% — no caminho. KR2 em 0.0% — foco em abordagem ativa dos Pro. KR3: 6/10. Semana 2 do trimestre.",
     "kr1_trend": [
-      30.2
+      30.2,
+      910.0
     ],
     "kr2_trend": [
+      0.0,
       0.0
     ],
     "kr3_trend": [
+      6,
       6
     ],
+    "plane_stats": {
+      "total": 0,
+      "concluidas": 0,
+      "em_andamento": 0,
+      "nao_iniciadas": 0
+    },
     "key_results": [
       {
         "label": "KR1 · Aumentar faturamento da base +30%",
         "icon": "📈",
         "unit": "%",
-        "current": 30.2,
+        "current": 910.0,
         "target": 30,
         "delta": null,
         "details": [
           {
-            "label": "Ticket médio atual",
-            "value": "R$276.76",
+            "label": "ARPU atual",
+            "value": "R$2146.53",
             "color": "#e8eaf0"
           },
           {
-            "label": "Ticket base (01/abr)",
+            "label": "ARPU base (01/abr)",
             "value": "R$212.53",
             "color": "#7b8099"
           },
           {
-            "label": "MRR total",
-            "value": "R$19,926.41",
-            "color": "#e8eaf0"
-          },
-          {
-            "label": "Clientes ativos",
-            "value": "72",
+            "label": "Clientes pagantes",
+            "value": "22",
             "color": "#7b8099"
           },
           {
             "label": "Crescimento acumulado",
-            "value": "30.2%",
+            "value": "910.0%",
             "color": "#f5a623"
           },
           {
@@ -105,7 +109,7 @@
           },
           {
             "label": "Ritmo necessário",
-            "value": "~-0.02pp / semana",
+            "value": "~-80.0pp / semana",
             "color": "#7b8099"
           }
         ]
@@ -132,6 +136,11 @@
             "label": "Conversões no trimestre",
             "value": "0",
             "color": "#e8eaf0"
+          },
+          {
+            "label": "Base Pro (início trim.)",
+            "value": "49",
+            "color": "#7b8099"
           },
           {
             "label": "Meta trimestral",
@@ -704,5 +713,5 @@
       "week": "Semana 16 · April 2026"
     }
   ],
-  "okr_updated_at": "2026-04-14T18:12:27.934065+00:00"
+  "okr_updated_at": "2026-04-14T19:28:31.606339+00:00"
 }
