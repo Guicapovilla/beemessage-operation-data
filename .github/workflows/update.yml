@@ -32,19 +32,22 @@ jobs:
       # Modo A (Project v2): LABEL_GITHUB_PRODUCT é ignorado (board inteiro). Modo B: label filtra issues no repo.
       # SPRINT_AUTO_GITHUB_PRODUCT=0 desliga detecção automática de sprint.
       # Secrets não podem começar com GITHUB_; use nomes *_GITHUB_PRODUCT em Settings → Secrets.
+      # OKR via módulo Plane: PLANE_OKR_WORKSPACE / PLANE_OKR_PROJECT_ID / PLANE_OKR_MODULE_ID.
       - name: Gerar dados
         env:
           PLANE_API_TOKEN: ${{ secrets.PLANE_API_TOKEN }}
+          PLANE_API_KEY: ${{ secrets.PLANE_API_TOKEN }}
           PLANE_WORKSPACE_SLUG: ${{ secrets.PLANE_WORKSPACE_SLUG }}
           PLANE_PROJECT_IDS: ${{ secrets.PLANE_PROJECT_IDS }}
+          PLANE_OKR_WORKSPACE: ${{ secrets.PLANE_OKR_WORKSPACE }}
+          PLANE_OKR_PROJECT_ID: ${{ secrets.PLANE_OKR_PROJECT_ID }}
+          PLANE_OKR_MODULE_ID: ${{ secrets.PLANE_OKR_MODULE_ID }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           ANTHROPIC_MODEL: ${{ secrets.ANTHROPIC_MODEL }}
           ANTHROPIC_MAX_TOKENS: ${{ secrets.ANTHROPIC_MAX_TOKENS }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          BASELINE_MRR: ${{ secrets.BASELINE_MRR }}
-          API_IMPLEMENTATIONS_COUNT: ${{ secrets.API_IMPLEMENTATIONS_COUNT }}
-          PLANE_OKR_CYCLE_ID: ${{ secrets.PLANE_OKR_CYCLE_ID }}
-          PLANE_OKR_MODULE_IDS: ${{ secrets.PLANE_OKR_MODULE_IDS }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           TOKEN_GITHUB_PRODUCT: ${{ secrets.TOKEN_GITHUB_PRODUCT }}
           OWNER_GITHUB_PRODUCT: ${{ secrets.OWNER_GITHUB_PRODUCT }}
           REPO_GITHUB_PRODUCT: ${{ secrets.REPO_GITHUB_PRODUCT }}
@@ -63,15 +66,3 @@ jobs:
           SPRINT_PREVIOUS_GITHUB_PRODUCT: ${{ secrets.SPRINT_PREVIOUS_GITHUB_PRODUCT }}
           SPRINT_AUTO_GITHUB_PRODUCT: ${{ secrets.SPRINT_AUTO_GITHUB_PRODUCT }}
         run: python -u scripts/fetch_metrics.py
-
-      - name: Commit e push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/latest.json data/snapshots.json
-          if git diff --staged --quiet; then
-            echo "Nenhuma alteração em data/"
-            exit 0
-          fi
-          git commit -m "chore(data): atualiza latest.json e snapshots"
-          git push

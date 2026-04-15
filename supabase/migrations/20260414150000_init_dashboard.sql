@@ -1,3 +1,21 @@
+create table if not exists public.operation_weeks (
+  week_key text primary key,
+  payload jsonb not null,
+  updated_at timestamptz not null default timezone('utc', now()),
+  constraint operation_weeks_week_key_format check (week_key ~ '^[0-9]{4}-W[0-9]{2}$')
+);
+
+create table if not exists public.dashboard_improvements (
+  id smallint primary key,
+  payload jsonb not null,
+  updated_at timestamptz not null default timezone('utc', now()),
+  constraint dashboard_improvements_single_row check (id = 1)
+);
+
+insert into public.dashboard_improvements (id, payload)
+values (
+  1,
+  $json$
 {
   "improvements": [
     {
@@ -66,3 +84,39 @@
     }
   ]
 }
+$json$::jsonb
+)
+on conflict (id) do update
+set payload = excluded.payload,
+    updated_at = timezone('utc', now());
+
+create or replace view public.v_week_index
+with (security_invoker = on) as
+select
+  week_key as key,
+  payload->>'week_label' as label,
+  payload->>'week_range' as range,
+  nullif(payload->'current'->>'rate', '')::numeric as rate,
+  payload->>'generated_at' as generated_at
+from public.operation_weeks;
+
+alter table public.operation_weeks enable row level security;
+alter table public.dashboard_improvements enable row level security;
+
+drop policy if exists "operation_weeks_select_anon" on public.operation_weeks;
+create policy "operation_weeks_select_anon"
+on public.operation_weeks
+for select
+to anon
+using (true);
+
+drop policy if exists "dashboard_improvements_select_anon" on public.dashboard_improvements;
+create policy "dashboard_improvements_select_anon"
+on public.dashboard_improvements
+for select
+to anon
+using (true);
+
+grant select on public.operation_weeks to anon;
+grant select on public.dashboard_improvements to anon;
+grant select on public.v_week_index to anon;

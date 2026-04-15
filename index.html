@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard Operações</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg:#0f1117;--surface:#1a1d27;--surface2:#222637;
@@ -234,6 +236,31 @@
   .okr-insight h3{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:600;margin-bottom:8px}
   .okr-insight p{font-size:12px;color:#bbc0d0;line-height:1.7}
   .tgrid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  /* Manual KR overrides */
+  .okr-manual{background:var(--surface);border:.5px solid var(--border2);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:20px}
+  .okr-manual-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+  .okr-manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .okr-manual-field label{display:block;font-size:11px;color:var(--muted);margin-bottom:6px}
+  .okr-manual-field input{width:100%;background:var(--surface2);border:.5px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-size:14px;font-weight:600;outline:none;transition:border-color .15s}
+  .okr-manual-field input:focus{border-color:var(--blue)}
+  .okr-manual-field .okr-manual-hint{font-size:10px;color:var(--hint);margin-top:4px}
+  .okr-manual-field .okr-manual-result{font-size:12px;color:var(--green);margin-top:6px;font-weight:500}
+  /* Kanban OKR tasks */
+  .okr-kanban{margin-top:28px}
+  .okr-kanban-board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .okr-kanban-col{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius-lg);min-height:200px;display:flex;flex-direction:column}
+  .okr-kanban-col-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:.5px solid var(--border)}
+  .okr-kanban-col-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+  .okr-kanban-col-count{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--surface2);color:var(--muted)}
+  .okr-kanban-col-body{padding:8px;flex:1;display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:400px}
+  .okr-kanban-card{background:var(--surface2);border:.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;font-size:12px;line-height:1.5}
+  .okr-kanban-card-title{color:var(--text);font-weight:500;margin-bottom:4px}
+  .okr-kanban-card-meta{display:flex;gap:6px;flex-wrap:wrap}
+  .okr-kanban-card-meta span{font-size:10px;color:var(--muted);background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px}
+  .okr-kanban-col.col-planned .okr-kanban-col-title{color:var(--muted)}
+  .okr-kanban-col.col-progress .okr-kanban-col-title{color:var(--amber)}
+  .okr-kanban-col.col-done .okr-kanban-col-title{color:var(--green)}
+  .okr-kanban-empty{font-size:11px;color:var(--hint);text-align:center;padding:20px 8px}
   /* COO */
   .coo-banner{background:rgba(167,139,250,.05);border:.5px solid rgba(167,139,250,.2);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:20px;display:flex;gap:12px;align-items:center}
   .coo-desc{font-size:12px;color:#bbc0d0;line-height:1.6}
@@ -331,6 +358,8 @@
   @media(max-width:700px){
     .kpis,.okr-kpis,.tgrid3,.imp-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
     .grid2,.okr-cards,.i-cols{grid-template-columns:1fr}
+    .okr-manual-grid{grid-template-columns:1fr}
+    .okr-kanban-board{grid-template-columns:1fr}
     .imp-board{grid-template-columns:repeat(4,minmax(200px,1fr))}
   }
   /* ── Seletor de semana ── */
@@ -431,11 +460,34 @@
       <div class="okr-obj-sub">Trimestre atual · 3 key results monitorados · Fonte: Stripe + Plane OKR</div>
     </div>
 
+    <div class="okr-manual" id="okr-manual-section">
+      <div class="okr-manual-title">Atualização manual dos KRs</div>
+      <div class="okr-manual-grid">
+        <div class="okr-manual-field">
+          <label for="kr1-input">KR1 · Ticket médio atual (R$)</label>
+          <input type="number" id="kr1-input" step="0.01" min="0" placeholder="Ex: 218.00" oninput="updateKR1Manual()">
+          <div class="okr-manual-hint">Base: R$212,00 · Meta: +30% (R$275,60)</div>
+          <div class="okr-manual-result" id="kr1-result"></div>
+        </div>
+        <div class="okr-manual-field">
+          <label for="kr3-input">KR3 · Implementações API concluídas</label>
+          <input type="number" id="kr3-input" step="1" min="0" max="99" placeholder="Ex: 2" oninput="updateKR3Manual()">
+          <div class="okr-manual-hint">Meta: 10 implementações no trimestre</div>
+          <div class="okr-manual-result" id="kr3-result"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="okr-kpis" id="okr-kpis"></div>
     <div class="okr-insight" id="okr-insight"></div>
 
     <div class="sec">Detalhe por key result</div>
     <div class="okr-cards" id="okr-cards"></div>
+
+    <div class="okr-kanban" id="okr-kanban-section">
+      <div class="sec">Tarefas do Sprint — Kanban</div>
+      <div class="okr-kanban-board" id="okr-kanban-board"></div>
+    </div>
 
     <div class="sec">Evolução semanal dos KRs</div>
     <div class="tgrid3">
@@ -463,7 +515,7 @@
         <button type="button" class="imp-btn-ghost" onclick="exportImprovementsJSON()">Exportar JSON</button>
       </div>
     </div>
-    <p class="imp-form-hint" style="margin:-12px 0 18px">O arquivo <code style="font-size:11px;background:var(--surface2);padding:2px 6px;border-radius:4px">data/improvements.json</code> é a fonte oficial no repositório. Novos cards criados aqui ficam salvos neste navegador até você exportar e colar no JSON.</p>
+    <p class="imp-form-hint" style="margin:-12px 0 18px">As melhorias oficiais são carregadas do Supabase. Novos cards criados aqui ficam salvos neste navegador até você exportar para sincronizar manualmente.</p>
     <div class="imp-kpis" id="imp-kpis"></div>
     <div class="sec">Kanban de iniciativas de melhoria</div>
     <div class="imp-board">
@@ -618,6 +670,15 @@ function bbar(pct,color){const p=Math.min(100,Math.max(0,pct));return`<div class
 function fdt(iso){if(!iso)return'—';const d=new Date(iso);return d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}
 function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function escAttr(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')}
+const SUPABASE_URL=(window.__SUPABASE_URL__||'').trim();
+const SUPABASE_ANON_KEY=(window.__SUPABASE_ANON_KEY__||'').trim();
+const _supabaseClient=(window.supabase&&SUPABASE_URL&&SUPABASE_ANON_KEY)
+  ?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY)
+  :null;
+function _ensureSupabase(){
+  if(!_supabaseClient)throw new Error('Supabase não configurado. Defina __SUPABASE_URL__ e __SUPABASE_ANON_KEY__ em supabase-config.js.');
+  return _supabaseClient;
+}
 
 const METRIC_HELP={
   kpi_rate:{
@@ -874,7 +935,7 @@ function renderOps(data){
         <div class="flow-week-item"><span class="flow-week-lbl">Saldo</span><span class="flow-week-val ${balCls}">${balStr}</span></div>
       </div>
       <p class="flow-week-sub">Saldo = criadas − concluídas. Negativo: fechamos mais do que abrimos de novo nesta semana. Positivo: entrou mais trabalho novo do que saiu concluído.</p>`
-    :`<p class="flow-week-sub" style="margin:0">Atualize o <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">fetch_metrics.py</code> e regenere <code style="font-size:11px;background:var(--surface);padding:2px 6px;border-radius:4px">data/latest.json</code> para ver criadas, concluídas e saldo.</p>`;
+    :`<p class="flow-week-sub" style="margin:0">Execute o coletor para enviar a semana ao Supabase e preencher criadas, concluídas e saldo.</p>`;
 
   const pm={};(P.areas||[]).forEach(a=>{pm[a.name]=a});
   document.getElementById('areas-body').innerHTML=C.areas.map(a=>{
@@ -986,22 +1047,95 @@ function renderOps(data){
     ${detailsBlock}`;
 }
 
-function renderOKRs(data){
+function fmtOkrMetric(n, unit){
+  const x=Number(n);
+  if(!Number.isFinite(x))return'—';
+  if(unit==='%')return(Math.round(x*10)/10).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+  return String(Math.round(x));
+}
+
+const KR1_BASE=212.00;
+const KR1_TARGET_PCT=30;
+const KR1_TARGET_VALUE=KR1_BASE*(1+KR1_TARGET_PCT/100);
+const KR3_TARGET=10;
+
+function loadManualKR(key){const v=localStorage.getItem(key);return v!==null?parseFloat(v):null;}
+function saveManualKR(key,val){if(val!==null&&!isNaN(val))localStorage.setItem(key,String(val));else localStorage.removeItem(key);}
+
+function updateKR1Manual(){
+  const inp=document.getElementById('kr1-input');
+  const res=document.getElementById('kr1-result');
+  const val=parseFloat(inp.value);
+  if(isNaN(val)||val<=0){res.textContent='';saveManualKR('okr_kr1_ticket',null);reRenderOKRCards();return;}
+  saveManualKR('okr_kr1_ticket',val);
+  const pct=((val-KR1_BASE)/KR1_BASE*100);
+  const progPct=Math.min(100,Math.round(pct/KR1_TARGET_PCT*100));
+  res.innerHTML=`Crescimento: <strong>${pct.toFixed(1)}%</strong> · Progressão: <strong>${progPct}%</strong> da meta · Falta: R$${(KR1_TARGET_VALUE-val).toFixed(2)}`;
+  res.style.color=progPct>=80?'#3ecf8e':progPct>=50?'#f5a623':'#f56565';
+  reRenderOKRCards();
+}
+
+function updateKR3Manual(){
+  const inp=document.getElementById('kr3-input');
+  const res=document.getElementById('kr3-result');
+  const val=parseInt(inp.value,10);
+  if(isNaN(val)||val<0){res.textContent='';saveManualKR('okr_kr3_done',null);reRenderOKRCards();return;}
+  saveManualKR('okr_kr3_done',val);
+  const progPct=Math.min(100,Math.round(val/KR3_TARGET*100));
+  res.innerHTML=`Concluídas: <strong>${val}</strong> / ${KR3_TARGET} · Progressão: <strong>${progPct}%</strong> da meta`;
+  res.style.color=progPct>=80?'#3ecf8e':progPct>=50?'#f5a623':'#f56565';
+  reRenderOKRCards();
+}
+
+function initManualInputs(){
+  const kr1v=loadManualKR('okr_kr1_ticket');
+  const kr3v=loadManualKR('okr_kr3_done');
+  if(kr1v!==null){document.getElementById('kr1-input').value=kr1v;updateKR1Manual();}
+  if(kr3v!==null){document.getElementById('kr3-input').value=kr3v;updateKR3Manual();}
+}
+
+let _lastOKRData=null;
+function reRenderOKRCards(){if(_lastOKRData)renderOKRKPIsAndCards(_lastOKRData);}
+
+function applyManualOverrides(krs){
+  const kr1v=loadManualKR('okr_kr1_ticket');
+  const kr3v=loadManualKR('okr_kr3_done');
+  if(kr1v!==null&&krs[0]){
+    const pct=((kr1v-KR1_BASE)/KR1_BASE*100);
+    krs[0].current=Math.round(pct*10)/10;
+    krs[0].details=[
+      {label:'Ticket médio atual',value:`R$${kr1v.toFixed(2)}`,color:'#e8eaf0'},
+      {label:'Ticket base (01/abr)',value:`R$${KR1_BASE.toFixed(2)}`,color:'#7b8099'},
+      {label:'Crescimento acumulado',value:`${pct.toFixed(1)}%`,color:'#f5a623'},
+      {label:'Meta trimestral',value:`+${KR1_TARGET_PCT}%`,color:'#7b8099'},
+      {label:'Meta absoluta',value:`R$${KR1_TARGET_VALUE.toFixed(2)}`,color:'#7b8099'},
+      {label:'Falta',value:`R$${Math.max(0,KR1_TARGET_VALUE-kr1v).toFixed(2)}`,color:'#7b8099'},
+    ];
+  }
+  if(kr3v!==null&&krs[2]){
+    krs[2].current=kr3v;
+    const existing=krs[2].details||[];
+    const impl=existing.find(d=>d.label==='Implementações concluídas');
+    if(impl)impl.value=String(kr3v);
+  }
+  return krs;
+}
+
+function renderOKRKPIsAndCards(data){
   const okr=data.okr||defOKR();
-  const krs=okr.key_results;
+  const krs=applyManualOverrides(JSON.parse(JSON.stringify(okr.key_results)));
   document.getElementById('okr-kpis').innerHTML=krs.map(kr=>{
     const pct=Math.min(100,Math.round((kr.current/kr.target)*100));
     const color=pct>=80?'#3ecf8e':pct>=50?'#f5a623':'#f56565';
-    const dh=kr.delta!=null?`<span style="font-size:11px;color:${kr.delta>0?'#3ecf8e':kr.delta<0?'#f56565':'#7b8099'}">${kr.delta>0?'+':''}${kr.delta}${kr.unit} esta semana</span>`:`<span style="font-size:11px;color:#4a4f6a">aguardando dados</span>`;
+    const cur=fmtOkrMetric(kr.current,kr.unit);
+    const tgt=fmtOkrMetric(kr.target,kr.unit);
+    const dh=kr.delta!=null?`<span style="font-size:11px;color:${kr.delta>0?'#3ecf8e':kr.delta<0?'#f56565':'#7b8099'}">${kr.delta>0?'+':''}${fmtOkrMetric(kr.delta,kr.unit)}${kr.unit} esta semana</span>`:`<span style="font-size:11px;color:#4a4f6a">aguardando dados</span>`;
     return`<div class="okr-kpi">
       <div class="okr-kpi-lbl">${kr.label}</div>
-      <div class="okr-pr"><div class="okr-cur" style="color:${color}">${kr.current}${kr.unit}</div><div class="okr-tgt">/ ${kr.target}${kr.unit} meta</div></div>
+      <div class="okr-pr"><div class="okr-cur" style="color:${color}">${cur}${kr.unit}</div><div class="okr-tgt">/ ${tgt}${kr.unit} meta</div></div>
       <div class="pb"><div class="pb-fill" style="width:${pct}%;background:${color}"></div></div>
       <div class="okr-meta"><span>${pct}% da meta</span>${dh}</div></div>`;
   }).join('');
-
-  document.getElementById('okr-insight').innerHTML=`<h3>Análise dos OKRs</h3><p>${okr.insight||'Conecte o Stripe e o Plane OKR para habilitar análise automática.'}</p>`;
-
   document.getElementById('okr-cards').innerHTML=krs.map(kr=>{
     const pct=Math.min(100,Math.round((kr.current/kr.target)*100));
     const color=pct>=80?'#3ecf8e':pct>=50?'#f5a623':'#f56565';
@@ -1011,6 +1145,49 @@ function renderOKRs(data){
       <div class="pb" style="margin-bottom:14px"><div class="pb-fill" style="width:${pct}%;background:${color}"></div></div>
       ${rows}</div>`;
   }).join('');
+}
+
+function renderOKRKanban(pp){
+  const board=document.getElementById('okr-kanban-board');
+  if(!board)return;
+  if(!pp||pp.error){board.innerHTML='<div class="okr-kanban-empty">Dados do sprint não disponíveis</div>';return;}
+  const planned=pp.planned||{count:0,items:[]};
+  const inProg=pp.in_progress||{count:0,items:[]};
+  const completed=pp.completed||{count:0,items:[]};
+  function cardHTML(items){
+    if(!items||!items.length)return'<div class="okr-kanban-empty">Nenhuma tarefa</div>';
+    return items.map(i=>{
+      const assignees=(i.assignees||[]).map(a=>`<span>${esc(a)}</span>`).join('');
+      const cycle=i.cycle_days!=null?`<span>${i.cycle_days}d</span>`:'';
+      return`<div class="okr-kanban-card"><div class="okr-kanban-card-title">${esc(i.title)}</div><div class="okr-kanban-card-meta">${assignees}${cycle}</div></div>`;
+    }).join('');
+  }
+  board.innerHTML=`
+    <div class="okr-kanban-col col-planned">
+      <div class="okr-kanban-col-hdr"><span class="okr-kanban-col-title">Planejadas</span><span class="okr-kanban-col-count">${planned.count}</span></div>
+      <div class="okr-kanban-col-body">${cardHTML(planned.items)}</div>
+    </div>
+    <div class="okr-kanban-col col-progress">
+      <div class="okr-kanban-col-hdr"><span class="okr-kanban-col-title">Em andamento</span><span class="okr-kanban-col-count">${inProg.count}</span></div>
+      <div class="okr-kanban-col-body">${cardHTML(inProg.items)}</div>
+    </div>
+    <div class="okr-kanban-col col-done">
+      <div class="okr-kanban-col-hdr"><span class="okr-kanban-col-title">Concluídas</span><span class="okr-kanban-col-count">${completed.count}</span></div>
+      <div class="okr-kanban-col-body">${cardHTML(completed.items)}</div>
+    </div>`;
+}
+
+function renderOKRs(data){
+  _lastOKRData=data;
+  const okr=data.okr||defOKR();
+  const krs=okr.key_results;
+
+  renderOKRKPIsAndCards(data);
+
+  document.getElementById('okr-insight').innerHTML=`<h3>Análise dos OKRs</h3><p>${okr.insight||'Conecte o Stripe e o Plane OKR para habilitar análise automática.'}</p>`;
+
+  renderOKRKanban(data.product_progress);
+  initManualInputs();
 
   const wks=(data.trend||[]).map(t=>t.week);
   function mini(id,td,color,target){
@@ -1500,19 +1677,40 @@ function closeImpDetail(){
   if(dlg)dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close();});
 })();
 
-fetch('data/improvements.json?v='+Date.now())
-  .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
-  .then(d=>{_impRemote=d.improvements||[];mergeAndRender();})
-  .catch(()=>{_impRemote=[];mergeAndRender();});
+async function _loadImprovements(){
+  const sb=_ensureSupabase();
+  const {data,error}=await sb.from('dashboard_improvements').select('payload').eq('id',1).maybeSingle();
+  if(error)throw error;
+  const payload=(data&&data.payload&&typeof data.payload==='object')?data.payload:{};
+  return Array.isArray(payload.improvements)?payload.improvements:[];
+}
 
 // ── OPERAÇÕES — sistema de semanas ─────────────────────────────────────────
 let _weeks   = [];   // índice de semanas [{key,label,range,rate}, ...]
 let _weekIdx = -1;   // índice atual em _weeks (-1 = latest)
 let _isLive  = true; // true = exibindo semana mais recente
 
-function _weekUrl(key){
-  if(!key||key==='latest') return 'data/latest.json?v='+Date.now();
-  return 'data/weeks/'+key+'.json?v='+Date.now();
+async function _loadWeeksIndex(){
+  const sb=_ensureSupabase();
+  const {data,error}=await sb.from('v_week_index').select('key,label,range,rate,generated_at').order('key',{ascending:true});
+  if(error)throw error;
+  return Array.isArray(data)?data:[];
+}
+
+async function _loadWeekPayload(key){
+  const sb=_ensureSupabase();
+  const {data,error}=await sb.from('operation_weeks').select('payload').eq('week_key',key).maybeSingle();
+  if(error)throw error;
+  if(!data||!data.payload)throw new Error(`Semana ${key} não encontrada`);
+  return data.payload;
+}
+
+async function _loadLatestPayload(){
+  const sb=_ensureSupabase();
+  const {data,error}=await sb.from('operation_weeks').select('payload').order('week_key',{ascending:false}).limit(1).maybeSingle();
+  if(error)throw error;
+  if(!data||!data.payload)throw new Error('Nenhuma semana encontrada no Supabase');
+  return data.payload;
 }
 
 function _buildWeekSelect(){
@@ -1580,34 +1778,41 @@ function weekNav(dir){
   _fetchAndRender(key);
 }
 
-function _fetchAndRender(key){
-  const url=_weekUrl(key);
-  fetch(url)
-    .then(r=>{if(!r.ok)throw new Error(r.status);return r.json()})
-    .then(d=>{renderOps(d);renderOKRs(d);renderCOO(d);renderProductProgress(d.product_progress);})
-    .catch(e=>{document.getElementById('tab-ops').innerHTML=
-      `<p style="color:#f56565;padding:40px 0">Erro ao carregar semana: ${e.message}</p>`;});
+async function _fetchAndRender(key){
+  try{
+    const d=(key&&key!=='latest')?await _loadWeekPayload(key):await _loadLatestPayload();
+    renderOps(d);renderOKRs(d);renderCOO(d);renderProductProgress(d.product_progress);
+  }catch(e){
+    document.getElementById('tab-ops').innerHTML=
+      `<p style="color:#f56565;padding:40px 0">Erro ao carregar semana: ${e.message}</p>`;
+  }
 }
 
-function loadDashboard(){
-  // 1. Carrega índice de semanas
-  fetch('data/snapshots.json?v='+Date.now())
-    .then(r=>r.ok?r.json():[])
-    .catch(()=>[])
-    .then(weeks=>{
-      _weeks=Array.isArray(weeks)?weeks:[];
-      // Se não há índice ainda, cai no latest.json direto
-      if(_weeks.length===0){
-        _weekIdx=-1;_isLive=true;
-        document.getElementById('week-select').innerHTML='<option value="latest">Semana atual</option>';
-        _updateNavButtons();
-        return _fetchAndRender('latest');
-      }
-      _weekIdx=_weeks.length-1;  // mais recente
-      _isLive=true;
-      _buildWeekSelect();
-      return _fetchAndRender(_weeks[_weekIdx].key);
-    });
+async function loadDashboard(){
+  try{
+    _impRemote=await _loadImprovements();
+    mergeAndRender();
+  }catch(_){
+    _impRemote=[];
+    mergeAndRender();
+  }
+  try{
+    _weeks=await _loadWeeksIndex();
+    if(_weeks.length===0){
+      _weekIdx=-1;_isLive=true;
+      document.getElementById('week-select').innerHTML='<option value="latest">Semana atual</option>';
+      _updateNavButtons();
+      await _fetchAndRender('latest');
+      return;
+    }
+    _weekIdx=_weeks.length-1;
+    _isLive=true;
+    _buildWeekSelect();
+    await _fetchAndRender(_weeks[_weekIdx].key);
+  }catch(e){
+    document.getElementById('tab-ops').innerHTML=
+      `<p style="color:#f56565;padding:40px 0">Erro ao carregar dados no Supabase: ${e.message}</p>`;
+  }
 }
 
 loadDashboard();

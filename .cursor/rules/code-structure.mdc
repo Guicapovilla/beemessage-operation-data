@@ -1,0 +1,72 @@
+---
+alwaysApply: true
+---
+# Estrutura e boas práticas de código
+
+## Organização e módulos
+
+- **Funções e tipos não ficam todas em um único arquivo**: distribua em vários `.py` e, quando crescer, em **pastas/pacotes** por domínio ou camada (ex.: cliente HTTP, parsing, regras de negócio, CLI). O padrão aceitável é um `main`/`cli` enxuto que importa o restante — não um monólito com centenas de funções no mesmo arquivo.
+- Um módulo = uma responsabilidade clara; evite “god files”. Extraia quando um arquivo passa a misturar coleta, transformação, I/O e apresentação.
+- API pública explícita: funções e classes usadas por outros módulos com nomes estáveis; detalhes internos com prefixo `_` ou submódulo `_*`.
+- Dependências em uma direção: camadas superiores importam inferiores, não o contrário (evite import circular).
+
+## Funções e legibilidade
+
+- Funções curtas com um propósito; se o nome precisa de “e”, considere dividir.
+- Nomes descritivos (`fetch_okr_payload`, não `get_data`). Constantes em `UPPER_SNAKE_CASE` no topo do módulo ou em `constants`/config dedicado.
+- Preferir dados explícitos a estado global mutável; passar dependências (clientes HTTP, paths) como argumentos ou injeção simples em vez de variáveis globais.
+
+## Configuração e reprodutibilidade
+
+- Valores que mudam por ambiente (URLs, tokens, paths) vêm de variáveis de ambiente ou arquivo de config — nunca commitar segredos.
+- Comportamento determinístico quando possível: seeds, ordenação estável, formatos de data explícitos (UTC + ISO 8601).
+
+## Erros e robustez
+
+- Não engolir exceções com `except: pass`. Capturar tipos específicos, registrar contexto útil e relançar ou retornar erro tratado de propósito.
+- Falhas de I/O e rede: timeouts, retries com backoff quando fizer sentido, mensagens que ajudem a operar o sistema.
+
+## Testes e mudanças seguras
+
+- Lógica pura (parse, agregações) isolada facilita teste unitário; I/O em bordas com interfaces finas.
+- Ao alterar comportamento, manter contratos estáveis ou documentar breaking changes no commit/PR.
+
+## Exemplos
+
+```text
+# ❌ Evitar: um único script com fetch + parse + agregação + saída + CLI
+
+# ✅ Preferir: pastas/arquivos separados (exemplo)
+#   mypkg/
+#     __init__.py
+#     config.py      # load_config, AppConfig
+#     http_client.py # fetch_raw
+#     parsing.py     # parse_payload
+#     output.py      # write_output
+#     cli.py         # argparse + main fino
+```
+
+```python
+# Funções nomeadas em módulos distintos, importadas onde precisar
+def load_config() -> AppConfig: ...
+def fetch_raw(client: HttpClient, url: str) -> bytes: ...
+def parse_payload(raw: bytes) -> OkrSnapshot: ...
+def write_output(path: Path, snapshot: OkrSnapshot) -> None: ...
+```
+
+```python
+# ❌ BAD
+try:
+    data = requests.get(url).json()
+except Exception:
+    pass
+
+# ✅ GOOD
+try:
+    resp = requests.get(url, timeout=30)
+    resp.raise_for_status()
+    data = resp.json()
+except requests.RequestException as e:
+    logger.exception("Falha ao buscar %s", url)
+    raise
+```
